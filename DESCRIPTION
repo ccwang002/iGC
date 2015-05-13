@@ -1,0 +1,12 @@
+Package: iGC
+Type: Package
+Title: An integrated analysis package of Gene expression and Copy number alteration
+Version: 1.0
+Date: 2015-04-23
+Author: YiPin Lai <r99945018 at ntu.edu.tw> and TzuPin Lu <tplu at ntu.edu.tw>
+Maintainer: YiPin Lai <r99945018 at ntu.edu.tw> and TzuPin Lu <tplu at ntu.edu.tw>
+Description: This package is intended to identify differentially expressed genes driven by 
+    Copy Number Alterations from samples with both gene expression and CNA data.
+License: GPL-3
+Suggests: knitr
+VignetteBuilder: knitr
