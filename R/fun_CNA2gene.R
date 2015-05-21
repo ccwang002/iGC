@@ -1,5 +1,6 @@
-CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold, cna.loss.threshold, col.sample, 
-    col.chrmosome, col.startloci, col.endloci, col.seg.mean, outputList = FALSE) {
+CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold, 
+    cna.loss.threshold, col.sample, col.chrmosome, col.startloci, col.endloci, 
+    col.seg.mean, outputList = FALSE) {
     if (missing(directory)) {
         path_cna <- getwd()
     } else {
@@ -25,7 +26,8 @@ CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold, 
                 files_cna <- list.files(path = path_cna)
             }
         } else {
-            files_cna <- list.files(path = path_cna, pattern = paste("*\\", file.pattern, sep = ""))
+            files_cna <- list.files(path = path_cna, pattern = paste("*\\", file.pattern, 
+                sep = ""))
         }
     }
     
@@ -81,10 +83,10 @@ CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold, 
             
             
             if (length(idx_db) > 0) {
-                idx_srt = head(which(cna_main[ii, idx_colstartloci] < hg19DBNM[idx_db[1]:tail(idx_db, 1), 
-                  4]), 1)
-                idx_end = tail(which(cna_main[ii, idx_colendloci] > hg19DBNM[idx_db[1]:tail(idx_db, 1), 3]), 
-                  1)
+                idx_srt = head(which(cna_main[ii, idx_colstartloci] < hg19DBNM[idx_db[1]:tail(idx_db, 
+                  1), 4]), 1)
+                idx_end = tail(which(cna_main[ii, idx_colendloci] > hg19DBNM[idx_db[1]:tail(idx_db, 
+                  1), 3]), 1)
                 
                 if (!is.na(idx_srt > 0 && idx_end > 0) && idx_end > idx_srt) {
                   GL = unique(hg19DBNM[idx_db[idx_srt:idx_end], 6])
@@ -114,12 +116,14 @@ CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold, 
     if (length(CNAwholeGeneList) == 0) {
         CNAwholeGeneList <- wholeGeneList
     } else {
-        CNAwholeGeneList <- merge(CNAwholeGeneList, wholeGeneList, by = "GeneList", sort = F)
+        CNAwholeGeneList <- merge(CNAwholeGeneList, wholeGeneList, by = "GeneList", 
+            sort = F)
     }
     CNAtoGeneList <- CNAwholeGeneList
     save(CNAtoGeneList, file = paste(path_cna, "CNAtoGeneList.rda", sep = "/"))
     
     if (outputList) {
-        write.csv(CNAtoGeneList, file = paste(path_cna, "CNAtoGeneList.csv", sep = "/"), row.names = F)
+        write.csv(CNAtoGeneList, file = paste(path_cna, "CNAtoGeneList.csv", sep = "/"), 
+            row.names = F)
     }
 } 

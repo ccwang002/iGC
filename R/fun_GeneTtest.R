@@ -1,5 +1,6 @@
-CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.file, directory, map.loc.start, 
-    map.loc.end, gain.ratio, loss.ratio, tcga = TRUE, outputList = TRUE, output_GSEA = FALSE) {
+CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.file, 
+    directory, map.loc.start, map.loc.end, gain.ratio, loss.ratio, tcga = TRUE, 
+    outputList = TRUE, output_GSEA = FALSE) {
     if (missing(directory)) {
         path_map <- getwd()
     } else {
@@ -27,7 +28,8 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
             sampleName.nona <- sampleName[, complete.cases(sampleName[2, ])]
             idx.nona <- match(sampleName.nona[1, ], sampleName1)
             CNAwholeGeneList_nona <- CNAwholeGeneList[, c(1, idx.nona)]
-            colnames(CNAwholeGeneList_nona) <- c("GeneList", paste(as.character(sampleName.nona[2, ])))
+            colnames(CNAwholeGeneList_nona) <- c("GeneList", paste(as.character(sampleName.nona[2, 
+                ])))
             CNAwholeGeneList_tumor <- CNAwholeGeneList_nona
         }
     } else if (tcga) {
@@ -45,13 +47,14 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
             cna_map <- cna_map_input
         }
         sampleName1 <- colnames(CNAwholeGeneList)
-        idx_match <- match(substr(sampleName1, start = map.loc.start, stop = map.loc.end), substr(cna_map[, 
-            1], start = map.loc.start, stop = map.loc.end))
+        idx_match <- match(substr(sampleName1, start = map.loc.start, stop = map.loc.end), 
+            substr(cna_map[, 1], start = map.loc.start, stop = map.loc.end))
         sampleName2 <- cna_map[idx_match, 2]
         sampleName <- rbind(sampleName1, as.character(sampleName2))
         CNAwholeGeneList_name <- CNAwholeGeneList
         colnames(CNAwholeGeneList_name) <- c("GeneList", paste(as.character(sampleName2[2:length(sampleName2)])))
-        idx_tumor <- which(substr(colnames(CNAwholeGeneList_name), start = 14, stop = 14) == "0")
+        idx_tumor <- which(substr(colnames(CNAwholeGeneList_name), start = 14, 
+            stop = 14) == "0")
         CNAwholeGeneList_tumor <- CNAwholeGeneList_name[, c(1, idx_tumor)]
     }
     
@@ -63,11 +66,13 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
         ListGL[kk, 3] <- length(idx_loss)
         ListGL[kk, 4] <- length(idx_normal)
     }
-    ListGLratio <- data.frame(numGL, ListGL[, 2:4]/(ncol(CNAwholeGeneList_tumor) - 1))
+    ListGLratio <- data.frame(numGL, ListGL[, 2:4]/(ncol(CNAwholeGeneList_tumor) - 
+        1))
     names(ListGLratio) <- c("GeneList", "ratioGain", "ratioLoss", "ratioNormal")
     
     CNAwholeGeneListNum <- c()
-    CNAwholeGeneListNum <- merge(CNAwholeGeneList_tumor, ListGLratio, by = "GeneList", sort = F)
+    CNAwholeGeneListNum <- merge(CNAwholeGeneList_tumor, ListGLratio, by = "GeneList", 
+        sort = F)
     
     if (missing(gain.ratio)) {
         gain_ratio <- 0.2
@@ -106,7 +111,8 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
     idx_Ggene <- match(thGlist_gexp[, 1], GeneExp[, 1])
     for (pp in 2:(ncol(thGlist_gexp) - 3)) {
         if (tcga) {
-            idx_Gsam <- pmatch(substr(colnames(thGlist_gexp[pp]), start = 1, stop = 16), colnames(GeneExp))
+            idx_Gsam <- pmatch(substr(colnames(thGlist_gexp[pp]), start = 1, stop = 16), 
+                colnames(GeneExp))
         } else {
             idx_Gsam <- match(colnames(thGlist_gexp[pp]), colnames(GeneExp))
         }
@@ -116,7 +122,8 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
     idx_Lgene <- match(thLlist_gexp[, 1], GeneExp[, 1])
     for (qq in 2:(ncol(thLlist_gexp) - 3)) {
         if (tcga) {
-            idx_Lsam <- pmatch(substr(colnames(thLlist_gexp[qq]), start = 1, stop = 16), colnames(GeneExp))
+            idx_Lsam <- pmatch(substr(colnames(thLlist_gexp[qq]), start = 1, stop = 16), 
+                colnames(GeneExp))
         } else {
             idx_Lsam <- match(colnames(thLlist_gexp[qq]), colnames(GeneExp))
         }
@@ -148,8 +155,8 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
     }
     
     fdr_Gain <- p.adjust(pValue_Gain, method = "fdr")
-    Gain_output <- data.frame(GeneList_Gain, meanGain, meanLoss, meanNormal, meanDiff_GnonG, thGlist_expmat[, 
-        (ncol(thGlist) - 2):ncol(thGlist)], pValue_Gain, fdr_Gain)
+    Gain_output <- data.frame(GeneList_Gain, meanGain, meanLoss, meanNormal, meanDiff_GnonG, 
+        thGlist_expmat[, (ncol(thGlist) - 2):ncol(thGlist)], pValue_Gain, fdr_Gain)
     Gain_sorted <- Gain_output[order(Gain_output$pValue_Gain), ]
     save(Gain_sorted, file = paste(path_map, "Gain_sorted.rda", sep = "/"))
     
@@ -182,8 +189,8 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
     }
     
     fdr_Loss <- p.adjust(pValue_Loss, method = "fdr")
-    Loss_output <- data.frame(GeneList_Loss, meanGain, meanLoss, meanNormal, meanDiff_LnonL, thLlist_expmat[, 
-        (ncol(thLlist) - 2):ncol(thLlist)], pValue_Loss, fdr_Loss)
+    Loss_output <- data.frame(GeneList_Loss, meanGain, meanLoss, meanNormal, meanDiff_LnonL, 
+        thLlist_expmat[, (ncol(thLlist) - 2):ncol(thLlist)], pValue_Loss, fdr_Loss)
     Loss_sorted <- Loss_output[order(Loss_output$pValue_Loss), ]
     save(Loss_sorted, file = paste(path_map, "Loss_sorted.rda", sep = "/"))
     
@@ -194,37 +201,29 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
     idx_both_loss <- match(output_both_gain[, 1], Loss_output[, 1])
     output_both_loss <- Loss_output[idx_both_loss, ]
     Both_GainLoss_sorted <- data.frame(output_both_gain, output_both_loss)
-    save(Both_GainLoss_sorted, file = paste(path_map, "Both_GainLoss_sorted.rda", sep = "/"))
+    save(Both_GainLoss_sorted, file = paste(path_map, "Both_GainLoss_sorted.rda", 
+        sep = "/"))
     
     
     if (outputList) {
-        write.csv(Gain_sorted, file = paste(path_map, "Gain_sorted.csv", sep = "/"), row.names = F)
-        write.csv(Loss_sorted, file = paste(path_map, "Loss_sorted.csv", sep = "/"), row.names = F)
-        write.csv(Both_GainLoss_sorted, file = paste(path_map, "Both_GainLoss_sorted.csv", sep = "/"), row.names = F)
+        write.csv(Gain_sorted, file = paste(path_map, "Gain_sorted.csv", sep = "/"), 
+            row.names = F)
+        write.csv(Loss_sorted, file = paste(path_map, "Loss_sorted.csv", sep = "/"), 
+            row.names = F)
+        write.csv(Both_GainLoss_sorted, file = paste(path_map, "Both_GainLoss_sorted.csv", 
+            sep = "/"), row.names = F)
     }
     
     if (output_GSEA) {
         Gain_sorted_gsea <- Gain_sorted[, 1:5]
-        write.table(Gain_sorted_gsea, file = paste(path_map, "Gain_sorted_gsea.txt", sep = "/"), row.names = F, 
-            sep = "\t")
+        write.table(Gain_sorted_gsea, file = paste(path_map, "Gain_sorted_gsea.txt", 
+            sep = "/"), row.names = F, sep = "\t")
         Loss_sorted_gsea <- Loss_sorted[, 1:5]
-        write.table(Loss_sorted_gsea, file = paste(path_map, "Loss_sorted_gsea.txt", sep = "/"), row.names = F, 
-            sep = "\t")
-        Both_GainLoss_sorted_gsea <- data.frame(Both_GainLoss_sorted[, 1:5], Both_GainLoss_sorted[, 12:15])
-        write.table(GBoth_GainLoss_sorted_gsea, file = paste(path_map, "Both_GainLoss_sorted_gsea.txt", sep = "/"), 
-            row.names = F, sep = "\t")
+        write.table(Loss_sorted_gsea, file = paste(path_map, "Loss_sorted_gsea.txt", 
+            sep = "/"), row.names = F, sep = "\t")
+        Both_GainLoss_sorted_gsea <- data.frame(Both_GainLoss_sorted[, 1:5], Both_GainLoss_sorted[, 
+            12:15])
+        write.table(GBoth_GainLoss_sorted_gsea, file = paste(path_map, "Both_GainLoss_sorted_gsea.txt", 
+            sep = "/"), row.names = F, sep = "\t")
     }
-}
-
-
-
-
-
-
-
-
-
-
-
-
- 
+} 
