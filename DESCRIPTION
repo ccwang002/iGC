@@ -1,14 +1,21 @@
 Package: iGC
 Type: Package
-Title: An integrated analysis package of gene expression and copy number alteration
-Version: 1.0
+Title: An integrated analysis package of Gene expression and Copy number alteration
+Version: 0.1
 Date: 2015-04-23
-Authors@R: c( person("YiPin", "Lai", email = "r99945018@ntu.edu.tw", role = c("cre", "aut")),
-    person("LiangBo", "Wang", email = "r02945054@ntu.edu.tw", role = c("cre", "aut")),
-    person("TzuPin", "Lu", email = "tplu@ntu.edu.tw", role = "aut"))
-Description: This package is intended to identify differentially expressed genes driven by 
-    Copy Number Alterations (CNA) from samples with both gene expression and CNA data.
-License: GPL-3
+Authors@R: c(
+    person("YiPin", "Lai", email = "r99945018@ntu.edu.tw", role = c("aut")),
+    person("Liang Bo", "Wang", email = "r02945054@ntu.edu.tw", role = c("aut", "cre")),
+    person("TzuPin", "Lu", email = "tplu@ntu.edu.tw", role = c("aut")))
+Description: This package is intended to identify differentially expressed genes driven by
+    Copy Number Alterations from samples with both gene expression and CNA data.
+License: GPL-2
+URL: http://github.com/ccwang002/iGC
+BugReports: http://github.com/ccwang002/iGC/issues
 Suggests: knitr
 VignetteBuilder: knitr
-BugReports: https://github.com/ccwang002/iGC/issues
+Imports:
+    dplyr,
+    plyr,
+    stringr
+Depends: R (>= 3.2.0)
