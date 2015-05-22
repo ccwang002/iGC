@@ -1,10 +1,44 @@
-geneExpList <- function(file, directory, tcga = TRUE, probe = FALSE, outputList = FALSE) {
+#' Create gene list
+#'
+#' In order to create gene list, this function is used to
+#'
+#' This is the detail part, which can be optional.
+#' @section Detail section 1:
+#' This is section 1.
+#'
+#' @section Detail section 2:
+#' This is section 2.
+#'
+#' @param file
+#'        Filename for the gene list.
+#' @param directory
+#'        The directory gene list locates.
+#' @param tcga
+#'        True if TCGA's data is used.
+#' @param probe
+#'        True if \strong{blahblahblah}.
+#' @param outputList
+#'        True if \emph{blahblahblah}.
+#' @return  gene list.
+#' @examples
+#' \dontrun{
+#' geneExpList('my_gene_list.txt', ...)
+#' }
+#' @seealso
+#' My paper
+
+geneExpList <- function(
+  file, directory,
+  tcga = TRUE,
+  probe = FALSE,
+  outputList = FALSE
+) {
     if (missing(directory)) {
         path <- getwd()
     } else {
         path <- directory
     }
-    
+
     GeneExp <- vector()
     if (!tcga) {
         GeneExp <- read.csv(paste(path, file, sep = "/"), header = TRUE)
@@ -32,10 +66,10 @@ geneExpList <- function(file, directory, tcga = TRUE, probe = FALSE, outputList 
             }
         }
     }
-    
+
     save(GeneExp, file = paste(path, "GeneExp.rda", sep = "/"))
-    
+
     if (outputList) {
         write.csv(GeneExp, file = paste(path, "GeneExp.csv", sep = "/"), row.names = F)
     }
-} 
+}
