@@ -26,7 +26,7 @@
 #' }
 #' @seealso
 #' My paper
-
+#' @export
 geneExpList <- function(
   file, directory,
   tcga = TRUE,
