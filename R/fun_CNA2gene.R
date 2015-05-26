@@ -1,5 +1,5 @@
-CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold, 
-    cna.loss.threshold, col.sample, col.chrmosome, col.startloci, col.endloci, 
+CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold,
+    cna.loss.threshold, col.sample, col.chrmosome, col.startloci, col.endloci,
     col.seg.mean, outputList = FALSE) {
     if (missing(directory)) {
         path_cna <- getwd()
@@ -12,7 +12,7 @@ CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold,
     iniV = c(rep(0, length(GeneList)))
     cna2geneList <- vector()
     CNAwholeGeneList <- vector()
-    
+
     if (!tcga) {
         if (missing(file.pattern)) {
             files_cna <- list.files(path = path_cna)
@@ -26,11 +26,11 @@ CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold,
                 files_cna <- list.files(path = path_cna)
             }
         } else {
-            files_cna <- list.files(path = path_cna, pattern = paste("*\\", file.pattern, 
+            files_cna <- list.files(path = path_cna, pattern = paste("*\\", file.pattern,
                 sep = ""))
         }
     }
-    
+
     if (missing(col.sample)) {
         checkCOLloc <- scan(paste(path_cna, files_cna[1], sep = "/"), "", nlines = 1)
         idx_colsample <- grep("sample", checkCOLloc, ignore.case = T)
@@ -45,7 +45,7 @@ CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold,
         idx_colendloci <- col.endloci
         idx_colsegmean <- col.seg.mean
     }
-    
+
     if (missing(cna.gain.threshold)) {
         cna_gain_thres <- log(2.5, 2) - 1
     } else {
@@ -56,7 +56,7 @@ CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold,
     } else {
         cna_loss_thres <- cna.loss.threshold
     }
-    
+
     for (file in files_cna) {
         cna_main <- vector()
         title_cna <- vector()
@@ -70,7 +70,7 @@ CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold,
             title_cna <- substr(file, 1, idx.tit[1] - 1)
             cna_main <- read.csv(paste(path_cna, file, sep = "/"), header = T)
         }
-        
+
         for (ii in 1:dim(cna_main)[1]) {
             idx_cn <- vector()
             idx_db <- vector()
@@ -80,17 +80,17 @@ CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold,
             } else if (idx_cn == 24 || idx_cn == "Y") {
                 idx_db = which(hg19DBNM[, 2] == "Y")
             } else idx_db = which(hg19DBNM[, 2] == as.character(idx_cn))
-            
-            
+
+
             if (length(idx_db) > 0) {
-                idx_srt = head(which(cna_main[ii, idx_colstartloci] < hg19DBNM[idx_db[1]:tail(idx_db, 
+                idx_srt = head(which(cna_main[ii, idx_colstartloci] < hg19DBNM[idx_db[1]:tail(idx_db,
                   1), 4]), 1)
-                idx_end = tail(which(cna_main[ii, idx_colendloci] > hg19DBNM[idx_db[1]:tail(idx_db, 
+                idx_end = tail(which(cna_main[ii, idx_colendloci] > hg19DBNM[idx_db[1]:tail(idx_db,
                   1), 3]), 1)
-                
+
                 if (!is.na(idx_srt > 0 && idx_end > 0) && idx_end > idx_srt) {
                   GL = unique(hg19DBNM[idx_db[idx_srt:idx_end], 6])
-                  
+
                   if (is.na(cna_main[ii, idx_colsegmean])) {
                     gol = 0
                   } else if (cna_main[ii, idx_colsegmean] > cna_gain_thres) {
@@ -98,12 +98,12 @@ CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold,
                   } else if (cna_main[ii, idx_colsegmean] < cna_loss_thres) {
                     gol = -1
                   } else gol = 0
-                  
+
                   gol_all = c(rep(gol, length(GL)))
-                  
+
                   cna2gene_temp <- data.frame(GL, gol_all)
                   names(cna2gene_temp) <- c("Genes", title_cna[1])
-                  
+
                   cna2gene <- rbind(cna2gene, cna2gene_temp)
                 }
             }
@@ -116,14 +116,14 @@ CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold,
     if (length(CNAwholeGeneList) == 0) {
         CNAwholeGeneList <- wholeGeneList
     } else {
-        CNAwholeGeneList <- merge(CNAwholeGeneList, wholeGeneList, by = "GeneList", 
+        CNAwholeGeneList <- merge(CNAwholeGeneList, wholeGeneList, by = "GeneList",
             sort = F)
     }
     CNAtoGeneList <- CNAwholeGeneList
     save(CNAtoGeneList, file = paste(path_cna, "CNAtoGeneList.rda", sep = "/"))
-    
+
     if (outputList) {
-        write.csv(CNAtoGeneList, file = paste(path_cna, "CNAtoGeneList.csv", sep = "/"), 
+        write.csv(CNAtoGeneList, file = paste(path_cna, "CNAtoGeneList.csv", sep = "/"),
             row.names = F)
     }
-} 
+}
