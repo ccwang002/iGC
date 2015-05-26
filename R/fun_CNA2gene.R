@@ -6,8 +6,8 @@ CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold,
     } else {
         path_cna <- directory
     }
-    
-    load("C:/Users/Daphne/Documents/Project/hg19DBNM.rda")
+
+    data("hg19DBNM", package = "iGC", envir = environment())
     GeneList <- unique(hg19DBNM[, 6])
     iniV = c(rep(0, length(GeneList)))
     cna2geneList <- vector()
