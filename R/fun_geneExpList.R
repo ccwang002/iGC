@@ -1,6 +1,6 @@
 #' Create an overall gene expression list of entire input samples
 #'
-#' \code{geneExpList} returns an gene expression list of all input files from TCGA, GEO or other sources.
+#' \code{GeneExpList} returns an gene expression list of all input files from TCGA, GEO or other sources.
 #'
 #' @section geneExpList function:
 #' The geneExpList function is used to rearrange the input gene expression files to a gene expression
@@ -19,12 +19,12 @@
 #' @return  gene list.
 #' @examples
 #' \dontrun{
-#' geneExpList('my_gene_list.txt', "C:/Users/Documents/Project/Input_samples", True, False, True)
+#' GeneExpList('my_gene_list.txt', "C:/Users/Documents/Project/Input_samples", True, False, True)
 #' }
 #' @seealso
 #' iGC—an integrated analysis package of Gene expression and Copy number alteration
 #' @export
-geneExpList <- function(
+GeneExpList <- function(
   file, directory,
   tcga = TRUE,
   probe = FALSE,
