@@ -1,6 +1,6 @@
 #' Create an overall gene expression list of entire input samples
 #'
-#' \code{ListGeneExp} returns an gene expression list of all input files from The Cancer Genome Atlas (TCGA),
+#' \code{ListGeneExp} returns a gene expression list of all input files from The Cancer Genome Atlas (TCGA),
 #' Gene Expression Omnibus (GEO), and other sources.
 #'
 #' @section geneExpList function:
@@ -12,11 +12,12 @@
 #' @param directory
 #'        The directory gene list of input sample locates.
 #' @param tcga
-#'        True if TCGA's data is used.
+#'        True if TCGA's data is used. \strong{Default value is TRUE}.
 #' @param probe
-#'        True if \strong{the gene list of input sample has probe information}.
+#'        True if \strong{the gene list of input sample has probe information}. \strong{Default value is FALSE}.
 #' @param outputList
 #'        True if \emph{user wants to get the rearranged output list of all input files in csv format}.
+#'        \strong{Default value is TRUE}.
 #' @return  gene list.
 #' @examples
 #' \dontrun{
