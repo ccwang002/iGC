@@ -22,7 +22,7 @@
 #'        CNA expression threshold for defining as CNA-loss, where \strong{default value is set as 1.5 for loss}.
 #' @param col.sample
 #'        The column number of sample.
-#' @param col.chromsome
+#' @param col.chromosome
 #'        The column number of chromosome.
 #' @param col.startloci
 #'        The column number of starting position of each copy number segmentation.
@@ -42,7 +42,7 @@
 #' iGC-an integrated analysis package of Gene expression and Copy number alteration
 #' @export
 CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold,
-    cna.loss.threshold, col.sample, col.chrmosome, col.startloci, col.endloci,
+    cna.loss.threshold, col.sample, col.chromosome, col.startloci, col.endloci,
     col.seg.mean, outputList = True) {
     if (missing(directory)) {
         path_cna <- getwd()
@@ -83,7 +83,7 @@ CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold,
         idx_colsegmean <- grep("mean", checkCOLloc, ignore.case = T)
     } else {
         idx_colsample <- col.sample
-        idx_colchr <- col.chrmosome
+        idx_colchr <- col.chromosome
         idx_colstartloci <- col.startloci
         idx_colendloci <- col.endloci
         idx_colsegmean <- col.seg.mean
