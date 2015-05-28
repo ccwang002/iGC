@@ -9,12 +9,12 @@
 #'
 #' @format A data frame with 39997 rows and 7 variables:
 #' \describe{
-#'   \item{Marker ID}{RefSeq name with its corrsponding gene symbol}
+#'   \item{Marker.ID}{RefSeq name with its corrsponding gene symbol}
 #'   \item{Chromosome}{1-21, X and Y}
 #'   \item{Start}{starting position, in basepair number}
 #'   \item{Stop}{ending position, in basepair number}
 #'   \item{Strand}{positive or negative strand, in + or - symbols}
-#'   \item{Gene Symbol}{Gene name}
+#'   \item{Gene.Symbol}{Gene name}
 #'   \item{Transcript}{RefSeq name}
 #' }
 #' @source UCSC Genome Browser: \url{http://hgdownload.cse.ucsc.edu/downloads.html}
