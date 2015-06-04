@@ -1,0 +1,24 @@
+---
+title: "Overview of iGC"
+author: "iGC Developersr"
+date: "`r Sys.Date()`"
+output:
+  BiocStyle::html_document:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+```{r, fig.show='hold'}
+library(iGC)
+```
+This document presents an overview of the `iGC` package. To perform an integrated analysis of gene expression (GE) and copy number alteration (CNA) (iGC) concurrently, the `iGC` package is developed to identify differentially expressed genes driven by CNAs from samples with both GE and CNA data. That is, for each gene, the samples are classified into different groups based on their CNA statues and statistical tests are performed in the GE level accordingly. The `iGC` package provides three categories of important functions: 
+
+- ListGeneExp
+  : rearranges the input gene expression files to a gene expression list of entire samples
+- CNAtoGene
+  : maps CNA data to human genes and then defines the mapped human genes as CN gain or loss based on the CN threshold
+- CNAdrivenGene
+  : identifies CNA-driven differentially expressed genes
+
