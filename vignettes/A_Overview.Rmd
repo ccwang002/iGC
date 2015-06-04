@@ -1,6 +1,6 @@
 ---
 title: "Overview of iGC"
-author: "iGC Developersr"
+author: "iGC Developers"
 date: "`r Sys.Date()`"
 output:
   BiocStyle::html_document:
