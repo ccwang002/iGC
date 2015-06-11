@@ -37,6 +37,7 @@ ListGeneExp <- function(
     } else {
         path <- directory
     }
+    print(path)
 
     GeneExp <- vector()
     if (!tcga) {
@@ -47,8 +48,10 @@ ListGeneExp <- function(
         } else if (!probe) {
             colnames(GeneExp[1]) <- c("Gene")
         }
+        print(GeneExp)
     } else if (tcga || missing(file)) {
         files <- list.files(path = path, pattern = "*.data")
+        print(files)
         for (file in files) {
             bindtemp <- vector()
             title <- vector()
@@ -64,11 +67,14 @@ ListGeneExp <- function(
                 GeneExp <- merge(GeneExp, bindtemp, by = "GENE", sort = F)
             }
         }
+        print(GeneExp)
     }
 
-    save(GeneExp, file = paste(path, "GeneExp.rda", sep = "/"))
+    path.out <- getwd()
+    print(path.out)
+    save(GeneExp, file = paste(path.out, "GeneExp.rda", sep = "/"))
 
     if (outputList) {
-        write.csv(GeneExp, file = paste(path, "GeneExp.csv", sep = "/"), row.names = F)
+        write.csv(GeneExp, file = paste(path.out, "GeneExp.csv", sep = "/"), row.names = F)
     }
 }

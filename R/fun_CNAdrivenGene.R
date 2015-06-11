@@ -56,6 +56,7 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
     } else {
         path_map <- directory
     }
+    print(path.map)
 
     CNAwholeGeneList <- read.csv(CNAtoGeneList, header = T, check.names = FALSE)
 
@@ -208,7 +209,10 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
     Gain_output <- data.frame(GeneList_Gain, meanGain, meanLoss, meanNormal, meanDiff_GnonG,
         thGlist_expmat[, (ncol(thGlist) - 2):ncol(thGlist)], pValue_Gain, fdr_Gain)
     Gain_sorted <- Gain_output[order(Gain_output$pValue_Gain), ]
-    save(Gain_sorted, file = paste(path_map, "Gain_sorted.rda", sep = "/"))
+
+    path.out <- getwd()
+    print(path.out)
+    save(Gain_sorted, file = paste(path.out, "Gain_sorted.rda", sep = "/"))
 
 
     GeneList_Loss <- thLlist_gexp[, 1]
@@ -242,7 +246,7 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
     Loss_output <- data.frame(GeneList_Loss, meanGain, meanLoss, meanNormal, meanDiff_LnonL,
         thLlist_expmat[, (ncol(thLlist) - 2):ncol(thLlist)], pValue_Loss, fdr_Loss)
     Loss_sorted <- Loss_output[order(Loss_output$pValue_Loss), ]
-    save(Loss_sorted, file = paste(path_map, "Loss_sorted.rda", sep = "/"))
+    save(Loss_sorted, file = paste(path.out, "Loss_sorted.rda", sep = "/"))
 
 
     idx_both <- match(Gain_output[, 1], Loss_output[, 1])
@@ -251,29 +255,29 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
     idx_both_loss <- match(output_both_gain[, 1], Loss_output[, 1])
     output_both_loss <- Loss_output[idx_both_loss, ]
     Both_GainLoss_sorted <- data.frame(output_both_gain, output_both_loss)
-    save(Both_GainLoss_sorted, file = paste(path_map, "Both_GainLoss_sorted.rda",
+    save(Both_GainLoss_sorted, file = paste(path.out, "Both_GainLoss_sorted.rda",
         sep = "/"))
 
 
     if (outputList) {
-        write.csv(Gain_sorted, file = paste(path_map, "Gain_sorted.csv", sep = "/"),
+        write.csv(Gain_sorted, file = paste(path.out, "Gain_sorted.csv", sep = "/"),
             row.names = F)
-        write.csv(Loss_sorted, file = paste(path_map, "Loss_sorted.csv", sep = "/"),
+        write.csv(Loss_sorted, file = paste(path.out, "Loss_sorted.csv", sep = "/"),
             row.names = F)
-        write.csv(Both_GainLoss_sorted, file = paste(path_map, "Both_GainLoss_sorted.csv",
+        write.csv(Both_GainLoss_sorted, file = paste(path.out, "Both_GainLoss_sorted.csv",
             sep = "/"), row.names = F)
     }
 
     if (output_GSEA) {
         Gain_sorted_gsea <- Gain_sorted[, 1:5]
-        write.table(Gain_sorted_gsea, file = paste(path_map, "Gain_sorted_gsea.txt",
+        write.table(Gain_sorted_gsea, file = paste(path.out, "Gain_sorted_gsea.txt",
             sep = "/"), row.names = F, sep = "\t")
         Loss_sorted_gsea <- Loss_sorted[, 1:5]
-        write.table(Loss_sorted_gsea, file = paste(path_map, "Loss_sorted_gsea.txt",
+        write.table(Loss_sorted_gsea, file = paste(path.out, "Loss_sorted_gsea.txt",
             sep = "/"), row.names = F, sep = "\t")
         Both_GainLoss_sorted_gsea <- data.frame(Both_GainLoss_sorted[, 1:5], Both_GainLoss_sorted[,
             12:15])
-        write.table(GBoth_GainLoss_sorted_gsea, file = paste(path_map, "Both_GainLoss_sorted_gsea.txt",
+        write.table(GBoth_GainLoss_sorted_gsea, file = paste(path.out, "Both_GainLoss_sorted_gsea.txt",
             sep = "/"), row.names = F, sep = "\t")
     }
 }

@@ -36,7 +36,7 @@
 #' @return  mapped gene list with CNA status
 #' @examples
 #' \dontrun{
-#' CNAtoGene('*hg19.seg', "C:/Users/Documents/Project/Input_samples", True, 2.7, 1.3, 1, 2, 3, 4, 5, 6, True)
+#' CNAtoGene('*\\.hg19.seg.txt', "C:/Users/Documents/Project/Input_samples", True, 2.7, 1.3, 1, 2, 3, 4, 6, True)
 #' }
 #' @seealso
 #' iGC-an integrated analysis package of Gene expression and Copy number alteration
@@ -49,12 +49,11 @@ CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold,
     } else {
         path_cna <- directory
     }
+    print(path_cna)
 
     data("hg19DBNM", package = "iGC", envir = environment())
     GeneList <- unique(hg19DBNM[, 6])
     iniV = c(rep(0, length(GeneList)))
-    cna2geneList <- vector()
-    CNAwholeGeneList <- vector()
 
     if (!tcga) {
         if (missing(file.pattern)) {
@@ -69,10 +68,10 @@ CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold,
                 files_cna <- list.files(path = path_cna)
             }
         } else {
-            files_cna <- list.files(path = path_cna, pattern = paste("*\\", file.pattern,
-                sep = ""))
+            files_cna <- list.files(path = path_cna, pattern = file.pattern)
         }
     }
+    print(files_cna)
 
     if (missing(col.sample)) {
         checkCOLloc <- scan(paste(path_cna, files_cna[1], sep = "/"), "", nlines = 1)
@@ -94,12 +93,15 @@ CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold,
     } else {
         cna_gain_thres <- cna.gain.threshold
     }
+    print(cna_gain_thres)
     if (missing(cna.loss.threshold)) {
         cna_loss_thres <- log(1.5, 2) - 1
     } else {
         cna_loss_thres <- cna.loss.threshold
     }
+    print(cna_loss_thres)
 
+    CNAwholeGeneList <- vector()
     for (file in files_cna) {
         cna_main <- vector()
         title_cna <- vector()
@@ -113,7 +115,6 @@ CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold,
             title_cna <- substr(file, 1, idx.tit[1] - 1)
             cna_main <- read.csv(paste(path_cna, file, sep = "/"), header = T)
         }
-
         for (ii in 1:dim(cna_main)[1]) {
             idx_cn <- vector()
             idx_db <- vector()
@@ -151,22 +152,26 @@ CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold,
                 }
             }
         }
-    }
-    idx_GL = which(cna2gene[, 2] != 0)
-    idx_map = match(cna2gene[idx_GL, 1], wholeGeneList[, 1])
-    wholeGeneList[idx_map, 2] <- cna2gene[idx_GL, 2]
-    names(wholeGeneList) <- c("GeneList", title_cna[1])
-    if (length(CNAwholeGeneList) == 0) {
-        CNAwholeGeneList <- wholeGeneList
-    } else {
-        CNAwholeGeneList <- merge(CNAwholeGeneList, wholeGeneList, by = "GeneList",
-            sort = F)
+        idx_GL = which(cna2gene[, 2] != 0)
+        idx_map = match(cna2gene[idx_GL, 1], wholeGeneList[, 1])
+        wholeGeneList[idx_map, 2] <- cna2gene[idx_GL, 2]
+        names(wholeGeneList) <- c("GeneList", title_cna[1])
+        if (length(CNAwholeGeneList) == 0) {
+            CNAwholeGeneList <- wholeGeneList
+        } else {
+            CNAwholeGeneList <- merge(CNAwholeGeneList, wholeGeneList, by = "GeneList",
+                sort = F)
+        }
+
     }
     CNAtoGeneList <- CNAwholeGeneList
-    save(CNAtoGeneList, file = paste(path_cna, "CNAtoGeneList.rda", sep = "/"))
+
+    path.out <- getwd()
+    print(path.out)
+    save(CNAtoGeneList, file = paste(path.out, "CNAtoGeneList.rda", sep = "/"))
 
     if (outputList) {
-        write.csv(CNAtoGeneList, file = paste(path_cna, "CNAtoGeneList.csv", sep = "/"),
+        write.csv(CNAtoGeneList, file = paste(path.out, "CNAtoGeneList.csv", sep = "/"),
             row.names = F)
     }
 }
