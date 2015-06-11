@@ -1,5 +1,5 @@
 ---
-title: "Analysis Examples using iGC"
+title: "Analysis Example using iGC"
 author: "iGC Developers"
 date: "`r Sys.Date()`"
 output:
@@ -11,50 +11,70 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+In this section we will use `iGC` to perform an analysis on a subset of the breast cancer dataset selecting from The Cancer Genome Atlas (TCGA) in the format of level three. The example dataset contains 50 breast cancer samples with both its gene expression and copy number alterations.
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+## Install Package
 
-## Vignette Info
+To begin with, we install the required package through the biocLite(), and then load it.
 
-Note the various macros within the `vignette` setion of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+```{}
+source("http://www.bioconductor.org/biocLite.R")
+biocLite("iGC")
 
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+library(iGC)
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+## Load hg19-RefSeg
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
+Next, we load the human genome reference hg19 (hg19DBNM.rda) and check the paths of example dataset and sample ID mapping file.
 
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
+```
+data(hg19DBNM)
+system.file("extdata/GE", package = "iGC")
+system.file("extdata/CNA", package = "iGC")
+system.file("extdata", "FILE_SAMPLE_MAP.txt", package = "iGC")
 ```
 
-Also a quote using `>`:
+## Get oveall GE list using function `ListGeneExp`
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+Third, we apply the `ListGeneExp` function to create an overall gene expression list of entire input samples. The output file will be saved as GeneExp.rda.
+
+```
+ListGeneExp(file = '*level3.data.txt', directory = system.file("extdata/GE", package = "iGC"), tcga = TRUE, probe = FALSE, outputList = TRUE)
+load("GeneExp.rda")
+dim(GeneExp)
+head(GeneExp)
+```
+
+## Map CNA to human genes using function `CNAtoGene`
+
+Subsequently, we run `CNAtoGene` function to map CNA data to human genes using human genome version 19 as reference. For each mapped human genes, the input samples are divided into CNA-gain (G), CNA-loss (L), and neutral (N) groups based on its CNA statuses, whose default values are set as 2.5 for gain and 1.5 for loss. The output file will be saved as CNAtoGeneList.rda.
+
+```
+CNAtoGene(file.pattern = '*\\.hg19.seg.txt', directory = system.file("extdata/CNA", package = "iGC"), tcga = TRUE, cna.gain.threshold = 2.7, cna.loss.threshold = 1.3, col.sample = 1, col.chromosome = 2, col.startloci = 3, col.endloci = 4, col.seg.mean = 6, outputList = True)
+load("CNAtoGeneList.rda")
+dim(CNAtoGeneList)
+head(CNAtoGeneList)
+```
+
+## Identify CNA-driven differentially expressed genes using function `CNAdrivenGene`
+
+Lastly, we employ `CNAdrivenGene` function to identify differentially expressed genes driven by CNAs from samples with both proprocessed GE and CNA data that were obtained by previous two steps. Genes of CNAtoGeneList remains for further analyses if its ratio of the number of CN changed samples (G or L) to the number of total samples is larger than a given threshold. Then, statistical tests will be performed in the GE level by classifying the samples as G and L plus N groups or L and G plus N groups, depending on the CN of the interested gene increases or decreases. 
+That is, only genes showing CNAs in at least 20% of the samples will be analyzed further, and the threshold can be changed by users. The GE levels are evaluated by the Student’s t-test and Wilcoxon rank sum test. False discovery rate, p-value, associated statistics are included in output files, and gene set enrichment analysis (GSEA) can be performed directly.
+
+```
+CNAdrivenGene(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.file =  FILE_SAMPLE_MAP.txt, directory = system.file("extdata", package = "iGC"), map.loc.start = 43, map.loc.end = 49, gain.ratio = 0.15, loss.ratio = 0.15, tcga = TRUE, outputList = TRUE, output_GSEA = FALSE)
+
+load("Gain_sorted.rda")
+dim(Gain_sorted.rda)
+head(Gain_sorted.rda)
+
+load("Loss_sorted.rda")
+dim(Loss_sorted.rda)
+head(Loss_sorted.rda)
+
+load("Both_GainLoss_sorted.rda")
+dim(Both_GainLoss_sorted.rda)
+head(Both_GainLoss_sorted.rda)
+```
+

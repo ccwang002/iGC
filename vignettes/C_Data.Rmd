@@ -1,5 +1,5 @@
 ---
-title: "Vignette Title"
+title: "Data of iGC"
 author: "iGC Developers"
 date: "`r Sys.Date()`"
 output:
@@ -11,4 +11,4 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-To demonstrate the usage of the iGC package, the package bundles example data from 50 breast cancer samples. We selected a subset of a microarray dataset containing 523 breast cancer samples from The Cancer Genome Atlas (TCGA) in the format of level three. This dataset is called as pairedbr. It contains the GE and the CN data from the same individual concurrently. 
+To demonstrate the usage of the `iGC` package, the package bundles example data from 50 breast cancer samples. We selected a subset of a microarray dataset containing 523 breast cancer samples from The Cancer Genome Atlas (TCGA) in the format of level three. This dataset is called as pairedbr. It contains the gene expression (GE) and the copy number (CN) data from the same individual concurrently. The GE data was conducted by Agilent G4502A platform and the CN data was generated from Genome Wide SNP platform.  The example dataset of CN used here are hg19 segments.
