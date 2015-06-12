@@ -14,7 +14,7 @@ cna_to_gene <- function(
   orig_gene_order <- copy(gene_wise_CNA)
   setkey(gene_wise_CNA, Gene.Symbol) # add index
   plyr::m_ply(
-    sample_desc[3:5], read_cna_sample,
+    sample_desc, read_cna_sample,
     gene_wise_CNA = gene_wise_CNA,
     gain_th = cna.gain.threshold,
     loss_th = cna.loss.threshold,
@@ -40,14 +40,16 @@ read_cna_sample <- function(
     read_fun <- read_cna
   }
   cna <- read_fun(CNA_filepath)
+  gene_wise_CNA[, c(Sample):=0]
   for(cna_ix in seq_len(nrow(cna))) {
     cna_val <- cna[cna_ix, c(Segment_Mean)][[1]]
-    if (cna_val > cna.gain.threshold) {
+    if (cna_val > gain_th) {
       gol <- 1
-    } else if(cna_val < cna.loss.threshold) {
+    } else if(cna_val < loss_th) {
       gol <- -1
     } else {
       gol <- 0
+      next
     }
     cur_chr <- cna[cna_ix, .(Chromosome)][[1]]
     genes_on_same_chromosome <- hg19DBNM[Chromosome == cur_chr]
