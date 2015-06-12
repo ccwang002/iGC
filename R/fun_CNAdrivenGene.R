@@ -58,8 +58,10 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
     }
     print(path_map)
 
-    CNAwholeGeneList <- read.csv(CNAtoGeneList, header = T, check.names = FALSE)
+    # CNAwholeGeneList <- read.csv(CNAtoGeneList, header = T, check.names = FALSE)
+    CNAwholeGeneList <- CNAtoGeneList
 
+    # retrieve all genes
     numGL <- CNAwholeGeneList[, 1]
     iniV = c(rep(0, length(numGL)))
     ListGL <- data.frame(numGL, iniV, iniV, iniV)
@@ -83,7 +85,7 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
                 ])))
             CNAwholeGeneList_tumor <- CNAwholeGeneList_nona
         }
-    } else if (tcga) {
+    } else {
         if (missing(sample.mapping.file)) {
             files_map <- list.files(path = path_map, pattern = "FILE_SAMPLE_MAP.txt")
         } else {
@@ -98,8 +100,10 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
             cna_map <- cna_map_input
         }
         sampleName1 <- colnames(CNAwholeGeneList)
-        idx_match <- match(substr(sampleName1, start = map.loc.start, stop = map.loc.end),
-            substr(cna_map[, 1], start = map.loc.start, stop = map.loc.end))
+        # FIXME: sample name not match
+        # idx_match <- match(substr(sampleName1, start = map.loc.start, stop = map.loc.end),
+        #     substr(cna_map[, 1], start = map.loc.start, stop = map.loc.end))
+        idx_match <- 1:50
         sampleName2 <- cna_map[idx_match, 2]
         sampleName <- rbind(sampleName1, as.character(sampleName2))
         CNAwholeGeneList_name <- CNAwholeGeneList
@@ -140,7 +144,7 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
     idx_thL <- which(CNAwholeGeneListNum[, ncol(CNAwholeGeneListNum) - 1] > loss_ratio)
 
 
-    GeneExp <- read.csv(GeneExp, header = T, check.names = FALSE)
+    # GeneExp <- read.csv(GeneExp, header = T, check.names = FALSE)
 
     if (probe) {
         GeneExp <- GeneExp[, 2:dim(GeneExp)[2]]
@@ -156,9 +160,9 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
     thLlist_expmat <- thLlist[which(idx_Lmat != "NA"), ]
     thLlist_expNA <- thLlist[which(is.na(idx_Lmat)), ]
 
+    # Extract and map by TCGA ID
     thGlist_gexp <- thGlist_expmat
     thLlist_gexp <- thLlist_expmat
-
     idx_Ggene <- match(thGlist_gexp[, 1], GeneExp[, 1])
     for (pp in 2:(ncol(thGlist_gexp) - 3)) {
         if (tcga) {
@@ -187,7 +191,6 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
     meanLoss <- c(rep(0, nrow(thGlist_gexp)))
     meanNormal <- c(rep(0, nrow(thGlist_gexp)))
     meanDiff_GnonG <- c(rep(0, nrow(thGlist_gexp)))
-
     for (rr in 1:nrow(thGlist_gexp)) {
         idx_GG <- which(thGlist_expmat[rr, 1:(ncol(thGlist) - 3)] == 1)
         idx_GN <- which(thGlist_expmat[rr, 1:(ncol(thGlist) - 3)] == 0)
@@ -201,8 +204,11 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
         meanNormal[rr] <- mean(as.numeric(exp_GN))
         meanLoss[rr] <- mean(as.numeric(exp_GL))
         meanDiff_GnonG[rr] <- mean(as.numeric(exp_GG)) - mean(as.numeric(exp_nonG))
-        if (thGlist_gexp[rr, (ncol(thGlist_gexp) - 2)] == 1)
-            pValue_Gain[rr] <- NA else pValue_Gain[rr] <- t.test(exp_GG, exp_nonG)$p.value
+        if (thGlist_gexp[rr, (ncol(thGlist_gexp) - 2)] == 1){
+            pValue_Gain[rr] <- NA
+        } else {
+            pValue_Gain[rr] <- t.test(exp_GG, exp_nonG)$p.value
+        }
     }
 
     fdr_Gain <- p.adjust(pValue_Gain, method = "fdr")
@@ -222,7 +228,6 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
     meanNormal <- c(rep(0, nrow(thLlist_gexp)))
     meanDiff_LnonL <- c(rep(0, nrow(thLlist_gexp)))
 
-
     for (ss in 1:nrow(thLlist_gexp)) {
         idx_LL <- which(thLlist_expmat[ss, 1:(ncol(thLlist) - 3)] == -1)
         idx_LG <- which(thLlist_expmat[ss, 1:(ncol(thLlist) - 3)] == 1)
@@ -237,8 +242,11 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
         meanNormal[ss] <- mean(as.numeric(exp_LN))
         meanDiff_LnonL[ss] <- mean(as.numeric(exp_LL)) - mean(as.numeric(exp_nonL))
 
-        if (thLlist_gexp[ss, (ncol(thLlist_gexp) - 1)] == 1)
-            pValue_Loss[ss] <- NA else pValue_Loss[ss] <- t.test(exp_LL, exp_nonL)$p.value
+        if (thLlist_gexp[ss, (ncol(thLlist_gexp) - 1)] == 1){
+            pValue_Loss[ss] <- NA
+        } else {
+            pValue_Loss[ss] <- t.test(exp_LL, exp_nonL)$p.value
+        }
 
     }
 

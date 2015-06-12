@@ -52,7 +52,7 @@ CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold,
     print(path_cna)
 
     data("hg19DBNM", package = "iGC", envir = environment())
-    GeneList <- unique(hg19DBNM[, 6])
+    GeneList <- unique(hg19DBNM$Gene.Symbol)
     iniV = c(rep(0, length(GeneList)))
 
     if (!tcga) {
@@ -120,12 +120,12 @@ CNAtoGene <- function(file.pattern, directory, tcga = TRUE, cna.gain.threshold,
             idx_db <- vector()
             idx_cn = cna_main[ii, idx_colchr]
             if (idx_cn == 23 || idx_cn == "X") {
-                idx_db = which(hg19DBNM[, 2] == "X")
+                idx_db = which(hg19DBNM[, 2, with = FALSE] == "X")
             } else if (idx_cn == 24 || idx_cn == "Y") {
-                idx_db = which(hg19DBNM[, 2] == "Y")
-            } else idx_db = which(hg19DBNM[, 2] == as.character(idx_cn))
+                idx_db = which(hg19DBNM[, 2, with = FALSE] == "Y")
+            } else idx_db = which(hg19DBNM[, 2, with = FALSE] == as.character(idx_cn))
 
-
+            # compare the region of CNV with genes of same chromosome
             if (length(idx_db) > 0) {
                 idx_srt = head(which(cna_main[ii, idx_colstartloci] < hg19DBNM[idx_db[1]:tail(idx_db,
                   1), 4]), 1)

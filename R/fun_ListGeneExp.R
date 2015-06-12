@@ -72,9 +72,9 @@ ListGeneExp <- function(
 
     path.out <- getwd()
     print(path.out)
-    save(GeneExp, file = paste(path.out, "GeneExp.rda", sep = "/"))
-
-    if (outputList) {
-        write.csv(GeneExp, file = paste(path.out, "GeneExp.csv", sep = "/"), row.names = F)
-    }
+#     if (outputList) {
+#         save(GeneExp, file = paste(path.out, "GeneExp.rda", sep = "/"))
+#         write.csv(GeneExp, file = paste(path.out, "GeneExp.csv", sep = "/"), row.names = F)
+#     }
+    GeneExp  # return computed GeneExp
 }
