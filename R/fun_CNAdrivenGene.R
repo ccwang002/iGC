@@ -56,7 +56,7 @@ CNAdrivenGene <- function(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.
     } else {
         path_map <- directory
     }
-    print(path.map)
+    print(path_map)
 
     CNAwholeGeneList <- read.csv(CNAtoGeneList, header = T, check.names = FALSE)
 
