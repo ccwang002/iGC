@@ -49,14 +49,25 @@ read_cna_sample <- function(
       gol <- -1
     } else {
       gol <- 0
-      next
+      next   # early fail, don't care about no gain-or-loss records
     }
     cur_chr <- cna[cna_ix, .(Chromosome)][[1]]
+
     genes_on_same_chromosome <- hg19DBNM[Chromosome == cur_chr]
+    # TODO: Is this right?
+    # CNA    a        ++++++++++++++
+    # Gene   A     >>>-->>>>>>>--->>>>
+    #   exon 1     F&T                                F
+    #   exon 2            T&T                         T
+    #   exon 3                    T&T                 T
+    # Gene   B                       <<<<---<<<<<<<
+    #   exon 1                       T&F              F
+    #   exon 2                              T&F       F
     genes_overlapped <- unique(genes_on_same_chromosome[
         Stop > cna[cna_ix, .(Start)][[1]] &
         Start < cna[cna_ix, .(End)][[1]],
       .(Gene.Symbol)][[1]])
+    # Overwrite previous record if any
     gene_wise_CNA[genes_overlapped, c(Sample):=gol]
   }
 }
