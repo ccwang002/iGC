@@ -9,6 +9,7 @@ create_gene_exp <- function(sample_desc, read_fun = NULL, ...) {
   ge_filepaths <- sample_desc$GE_filepath
   first_ge <- read_fun(ge_filepaths[1])
   raw_dfs <- alply(ge_filepaths, 1, read_fun, ..., .expand = FALSE, .progress = "time")
+  # TODO: remove magic [[2]]
   df <- as.data.table(llply(raw_dfs, function(df){df[[2]]}))
   setnames(df, seq_len(ncol(df)), sample_desc$Sample)
   df$GENE <- first_ge[[1]]

@@ -1,15 +1,16 @@
 #' @import data.table
 #' @export
-cna_to_gene <- function(
+create_gene_cna <- function(
   sample_desc,
   cna.gain.threshold = log(2.5, 2) - 1,
   cna.loss.threshold = log(1.5, 2) - 1,
-  col_chr = 'Chromosome', col_start = 'Start', col_end = 'End', col_val = 'Segment_Mean'
+  read_fun = NULL
 ) {
   # TODO: don't ship our own hg19 DB
   data("hg19DBNM", package = "iGC", envir = environment())
   hg19DBNM <- data.table(hg19DBNM)
 
+  # TODO: force no custom column names
   gene_wise_CNA <- unique(hg19DBNM[, .(Gene.Symbol)])
   orig_gene_order <- copy(gene_wise_CNA)
   setkey(gene_wise_CNA, Gene.Symbol) # add index
@@ -18,6 +19,7 @@ cna_to_gene <- function(
     gene_wise_CNA = gene_wise_CNA,
     gain_th = cna.gain.threshold,
     loss_th = cna.loss.threshold,
+    read_fun = NULL,
     .progress = 'time'
   )
   setkey(gene_wise_CNA, NULL)  # remove the index
@@ -54,19 +56,25 @@ read_cna_sample <- function(
     cur_chr <- cna[cna_ix, .(Chromosome)][[1]]
 
     genes_on_same_chromosome <- hg19DBNM[Chromosome == cur_chr]
-    # TODO: Is this right?
     # CNA    a        ++++++++++++++
-    # Gene   A     >>>-->>>>>>>--->>>>
-    #   exon 1     F&T                                F
+    # Gene   A     >>>>>-->>>>>>>->>>>
+    #   exon 1     T&T                                T
     #   exon 2            T&T                         T
     #   exon 3                    T&T                 T
     # Gene   B                       <<<<---<<<<<<<
     #   exon 1                       T&F              F
     #   exon 2                              T&F       F
+    # Gene   C     >>>>>>>>>>>>>>>>>>>>>
+    #   exon 1     T&T                                T
+    # Gene   D <<<
+    #   exon 1 F&T                                    F
+
+    # TODO: assure CNA recods cna[Start < End]
     genes_overlapped <- unique(genes_on_same_chromosome[
         Stop > cna[cna_ix, .(Start)][[1]] &
         Start < cna[cna_ix, .(End)][[1]],
       .(Gene.Symbol)][[1]])
+    # TODO: judge by transcript, count 1 and -1, the more wins
     # Overwrite previous record if any
     gene_wise_CNA[genes_overlapped, c(Sample):=gol]
   }
