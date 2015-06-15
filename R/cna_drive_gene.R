@@ -1,7 +1,7 @@
 #' @import data.table
 #' @import plyr
 #' @export
-find_cna_driven_gene <- function(
+cna_driven_gene <- function(
   gene_cna, gene_exp,
   gain_ratio = 0.2, loss_ratio = 0.2
 ) {
@@ -71,14 +71,18 @@ find_cna_driven_gene <- function(
         if (cna_type == 'gain') {
           if (length(g_gain_exp) == num_samples) {
             p_value <- NA
+            vs_rest_exp_diff <- NA
           } else {
             p_value = t.test(g_gain_exp, c(g_normal_exp, g_loss_exp))$p.value
+            vs_rest_exp_diff <- mean(g_gain_exp) - mean(c(g_normal_exp, g_loss_exp))
           }
         } else {
           if (length(g_loss_exp) == num_samples) {
             p_value <- NA
+            vs_rest_exp_diff <- NA
           } else {
             p_value = t.test(g_loss_exp, c(g_normal_exp, g_gain_exp))$p.value
+            vs_rest_exp_diff <- mean(g_loss_exp) - mean(c(g_normal_exp, g_gain_exp))
           }
         }
 
@@ -88,20 +92,67 @@ find_cna_driven_gene <- function(
           gol_ratio_table[gene, !"GENE", with=FALSE],
           gain_exp_mean = mean(g_gain_exp, na.rm = TRUE),
           normal_exp_mean = mean(g_normal_exp, na.rm = TRUE),
-          loss_exp_mean = mean(g_loss_exp, na.rm = TRUE)
+          loss_exp_mean = mean(g_loss_exp, na.rm = TRUE),
+          vs_rest_exp_diff = vs_rest_exp_diff
         )
       },
       .id = NULL,
       .progress = 'time'
     ))
     dt[, fdr := p.adjust(p_value, method = "fdr")]
+    setcolorder(
+        dt,
+        c("GENE", "p_value", "fdr",
+          "Gain", "Normal", "Loss",
+          "gain_exp_mean", "normal_exp_mean", "loss_exp_mean",
+          "vs_rest_exp_diff")
+    )
+    setnames(
+        dt,
+        c("Gain", "Normal", "Loss"),
+        c("gain_sample_ratio", "normal_sample_ratio", "loss_sample_ratio")
+    )
+    return(dt)
   }
 
   dt_gain <- exp_grouptest_driven_by_cna(cna_type = "gain")
   dt_loss <- exp_grouptest_driven_by_cna(cna_type = "loss")
 
+  # [.data.table requires key columns
+  setkey(dt_gain, "GENE")
+  setkey(dt_loss, "GENE")
+
+  dt_both <- dt_gain[, .(GENE, p_value, fdr, vs_rest_exp_diff)][dt_loss, nomatch=0]
+  # dt_both <- merge(dt_gain[, .(GENE, p_value, fdr)], dt_loss, by="GENE", all=TRUE)
+  setnames(
+    dt_both,
+    c("p_value", "fdr", "vs_rest_exp_diff",
+      "i.p_value", "i.fdr", "i.vs_rest_exp_diff"),
+    c("gain_p_value", "gain_fdr", "gain_vs_rest_exp_diff",
+      "loss_p_value", "loss_fdr", "loss_vs_exp_diff")
+  )
+  # move *_vs_rest_exp_diff to the end
+  setcolorder(
+    dt_both,
+    c(colnames(dt_both)[-c(4, 13)], colnames(dt_both)[c(4, 13)])
+  )
+  both_driven_genes <- dt_both[, .(GENE)]
+
+  dt_gain <- dt_gain[!both_driven_genes]
+  dt_loss <- dt_loss[!both_driven_genes]
+
+  # unset keys
+  setkey(dt_gain, NULL)
+  setkey(dt_loss, NULL)
+  setkey(dt_both, NULL)
+  # sorted by ascending fdr
+  setorderv(dt_gain, "fdr", 1)
+  setorderv(dt_loss, "fdr", 1)
+  setorderv(dt_both, c("gain_fdr", "loss_fdr"), c(1, 1))
+
   return (list(
-    dt_gain = dt_gain,
-    dt_loss = dt_loss
+    gain_driven = dt_gain,
+    loss_driven = dt_loss,
+    both = dt_both
   ))
 }

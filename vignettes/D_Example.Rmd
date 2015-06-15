@@ -83,7 +83,7 @@ Lastly, we employ `CNAdrivenGene` function to identify differentially expressed 
 That is, only genes showing CNAs in at least 20% of the samples will be analyzed further, and the threshold can be changed by users. The GE levels are evaluated by the Student’s t-test and Wilcoxon rank sum test. False discovery rate, p-value, associated statistics are included in output files, and gene set enrichment analysis (GSEA) can be performed directly.
 
 ```{r, eval=FALSE}
-ret <- find_cna_driven_gene(gene_cna, gene_exp)
+ret <- cna_driven_gene(gene_cna, gene_exp)
 # CNAdrivenGene(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.file =  'FILE_SAMPLE_MAP.txt', directory = system.file("extdata", package = "iGC"), map.loc.start = 43, map.loc.end = 49, gain.ratio = 0.15, loss.ratio = 0.15, tcga = TRUE, outputList = TRUE, output_GSEA = FALSE)
 
 load("Gain_sorted.rda")
