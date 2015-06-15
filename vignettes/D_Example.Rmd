@@ -83,19 +83,26 @@ Lastly, we employ `CNAdrivenGene` function to identify differentially expressed 
 That is, only genes showing CNAs in at least 20% of the samples will be analyzed further, and the threshold can be changed by users. The GE levels are evaluated by the Student’s t-test and Wilcoxon rank sum test. False discovery rate, p-value, associated statistics are included in output files, and gene set enrichment analysis (GSEA) can be performed directly.
 
 ```{r, eval=FALSE}
-ret <- cna_driven_gene(gene_cna, gene_exp)
+cna_driven_genes <- find_cna_driven_gene(gene_cna, gene_exp, gain_ratio = 0.15, loss_ratio = 0.15)
+head(cna_driven_genes$gain_driven)
+head(cna_driven_genes$loss_driven)
+
+head(cna_driven_genes$both)
+```
+
+```
 # CNAdrivenGene(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.file =  'FILE_SAMPLE_MAP.txt', directory = system.file("extdata", package = "iGC"), map.loc.start = 43, map.loc.end = 49, gain.ratio = 0.15, loss.ratio = 0.15, tcga = TRUE, outputList = TRUE, output_GSEA = FALSE)
 
-load("Gain_sorted.rda")
-dim(Gain_sorted.rda)
-head(Gain_sorted.rda)
+#load("Gain_sorted.rda")
+#dim(Gain_sorted.rda)
+#head(Gain_sorted.rda)
 
-load("Loss_sorted.rda")
-dim(Loss_sorted.rda)
-head(Loss_sorted.rda)
+#load("Loss_sorted.rda")
+#dim(Loss_sorted.rda)
+#head(Loss_sorted.rda)
 
-load("Both_GainLoss_sorted.rda")
-dim(Both_GainLoss_sorted.rda)
-head(Both_GainLoss_sorted.rda)
+#load("Both_GainLoss_sorted.rda")
+#dim(Both_GainLoss_sorted.rda)
+#head(Both_GainLoss_sorted.rda)
 ```
 

@@ -1,7 +1,7 @@
 #' @import data.table
 #' @import plyr
 #' @export
-cna_driven_gene <- function(
+find_cna_driven_gene <- function(
   gene_cna, gene_exp,
   gain_ratio = 0.2, loss_ratio = 0.2
 ) {
@@ -21,6 +21,7 @@ cna_driven_gene <- function(
   # setattr prevent from creating unneccessary object copies.
   setattr(gene_cna_t, 'dimnames', list(NULL, shared_genes))
 
+  cat("Computing gain/loss sample ratio ...\n")
   gol_ratio_table <- as.data.table(aaply(
     gene_cna_t,
     2,
@@ -28,7 +29,7 @@ cna_driven_gene <- function(
       c(Gain = sum(one_gene == 1),
         Loss = sum(one_gene == -1),
         Normal = sum(one_gene == 0))},
-    .progress = 'time'
+    .progress = progress_text(width=32)
   ) / length(all_samples))
   gol_ratio_table[, GENE:=shared_genes]
   setkeyv(gol_ratio_table, "GENE")
@@ -58,7 +59,6 @@ cna_driven_gene <- function(
       cna_driven_genes,
       1,
       function(gene) {
-        cat("Gene:", gene)
         g_exp <- cna_driven_exp[, c(gene)]
         g_gain_mask <- gain_mask[, c(gene)]
         g_normal_mask <- normal_mask[, c(gene)]
@@ -97,7 +97,7 @@ cna_driven_gene <- function(
         )
       },
       .id = NULL,
-      .progress = 'time'
+      .progress = progress_text(width=32)
     ))
     dt[, fdr := p.adjust(p_value, method = "fdr")]
     setcolorder(
@@ -115,7 +115,9 @@ cna_driven_gene <- function(
     return(dt)
   }
 
+  cat("Computing CNA gain driven gene records ... \n")
   dt_gain <- exp_grouptest_driven_by_cna(cna_type = "gain")
+  cat("Computing CNA loss driven gene records ... \n")
   dt_loss <- exp_grouptest_driven_by_cna(cna_type = "loss")
 
   # [.data.table requires key columns
@@ -146,9 +148,9 @@ cna_driven_gene <- function(
   setkey(dt_loss, NULL)
   setkey(dt_both, NULL)
   # sorted by ascending fdr
-  setorderv(dt_gain, "fdr", 1)
-  setorderv(dt_loss, "fdr", 1)
-  setorderv(dt_both, c("gain_fdr", "loss_fdr"), c(1, 1))
+  setorderv(dt_gain, "fdr", 1, na.last=TRUE)
+  setorderv(dt_loss, "fdr", 1, na.last=TRUE)
+  setorderv(dt_both, c("gain_fdr", "loss_fdr"), c(1, 1), na.last=TRUE)
 
   return (list(
     gain_driven = dt_gain,
