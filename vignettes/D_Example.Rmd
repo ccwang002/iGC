@@ -30,7 +30,7 @@ library(iGC)
 
 Next, we load the human genome reference hg19 (hg19DBNM.rda) and check the paths of example dataset and sample ID mapping file.
 
-```{r}
+```{r, eval=FALSE}
 data(hg19DBNM)
 system.file("extdata/GE", package = "iGC")
 system.file("extdata/CNA", package = "iGC")
@@ -46,7 +46,7 @@ sample_desc <- create_sample_desc(sample_desc_pth)
 head(sample_desc)
 ```
 
-```{r}
+```{r, eval=FALSE}
 sample_desc_alt <- create_sample_desc(
   sample_names = sample_desc$Sample,
   cna_filepaths = sample_desc$CNA_filepath,
@@ -59,7 +59,7 @@ head(sample_desc_alt)
 
 Third, we apply the `ListGeneExp` function to create an overall gene expression list of entire input samples. The output file will be saved as GeneExp.rda.
 
-```{r}
+```{r, eval=FALSE}
 gene_exp <- create_gene_exp(sample_desc)
 ```
 
@@ -68,7 +68,7 @@ gene_exp <- create_gene_exp(sample_desc)
 
 Subsequently, we run `CNAtoGene` function to map CNA data to human genes using human genome version 19 as reference. For each mapped human genes, the input samples are divided into CNA-gain (G), CNA-loss (L), and neutral (N) groups based on its CNA statuses, whose default values are set as 2.5 for gain and 1.5 for loss. The output file will be saved as CNAtoGeneList.rda.
 
-```{r}
+```{r, eval=FALSE}
 gain_loss = log2(c(2.7, 1.5)) - 1
 CNAtoGeneList <- cna_to_gene(sample_desc, cna.gain.threshold = gain_loss[1], cna.loss.threshold = gain_loss[2])
 # CNAtoGene(file.pattern = '*\\.hg19.seg.txt', directory = system.file("extdata/CNA", package = "iGC"), tcga = TRUE, cna.gain.threshold = log(2.7, 2) - 1, cna.loss.threshold = log(1.5, 2) - 1, col.sample = 1, col.chromosome = 2, col.startloci = 3, col.endloci = 4, col.seg.mean = 6, outputList = TRUE)
@@ -82,7 +82,7 @@ head(CNAtoGeneList)
 Lastly, we employ `CNAdrivenGene` function to identify differentially expressed genes driven by CNAs from samples with both proprocessed GE and CNA data that were obtained by previous two steps. Genes of CNAtoGeneList remains for further analyses if its ratio of the number of CN changed samples (G or L) to the number of total samples is larger than a given threshold. Then, statistical tests will be performed in the GE level by classifying the samples as G and L plus N groups or L and G plus N groups, depending on the CN of the interested gene increases or decreases. 
 That is, only genes showing CNAs in at least 20% of the samples will be analyzed further, and the threshold can be changed by users. The GE levels are evaluated by the Student’s t-test and Wilcoxon rank sum test. False discovery rate, p-value, associated statistics are included in output files, and gene set enrichment analysis (GSEA) can be performed directly.
 
-```{r}
+```{r, eval=FALSE}
 CNAdrivenGene(CNAtoGeneList, GeneExp, probe = FALSE, sample.mapping.file =  'FILE_SAMPLE_MAP.txt', directory = system.file("extdata", package = "iGC"), map.loc.start = 43, map.loc.end = 49, gain.ratio = 0.15, loss.ratio = 0.15, tcga = TRUE, outputList = TRUE, output_GSEA = FALSE)
 
 load("Gain_sorted.rda")
