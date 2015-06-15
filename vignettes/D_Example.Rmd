@@ -70,11 +70,11 @@ Subsequently, we run `CNAtoGene` function to map CNA data to human genes using h
 
 ```{r, eval=FALSE}
 gain_loss = log2(c(2.7, 1.5)) - 1
-CNAtoGeneList <- cna_to_gene(sample_desc, cna.gain.threshold = gain_loss[1], cna.loss.threshold = gain_loss[2])
+gene_cna <- create_gene_cna(sample_desc, cna.gain.threshold = gain_loss[1], cna.loss.threshold = gain_loss[2])
 # CNAtoGene(file.pattern = '*\\.hg19.seg.txt', directory = system.file("extdata/CNA", package = "iGC"), tcga = TRUE, cna.gain.threshold = log(2.7, 2) - 1, cna.loss.threshold = log(1.5, 2) - 1, col.sample = 1, col.chromosome = 2, col.startloci = 3, col.endloci = 4, col.seg.mean = 6, outputList = TRUE)
 # load("CNAtoGeneList.rda")
-dim(CNAtoGeneList)
-head(CNAtoGeneList)
+dim(gene_cna)
+head(gene_cna)
 ```
 
 ## Identify CNA-driven differentially expressed genes using function `CNAdrivenGene`
