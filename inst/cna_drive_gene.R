@@ -9,8 +9,7 @@ find_cna_driven_gene <- function(
 library(data.table)
 library(plyr)
 
-all_samples <- colnames(CNAtoGeneList)[-1]
-gene_cna <- CNAtoGeneList
+all_samples <- colnames(gene_cna)[-1]
 
 # get shared genes
 shared_genes <- intersect(
@@ -22,8 +21,11 @@ shared_genes <- intersect(
 # transpose so columns to be gene-wise, easier to compute
 setkeyv(gene_cna, c("Gene.Symbol"))
 gene_cna_t <- t(gene_cna[shared_genes, all_samples, with=FALSE])
-dimnames(gene_cna_t)[[1]] <- NULL
-dimnames(gene_cna_t)[[2]] <- shared_genes
+# see data.table's setattr doc page.
+# The following equals to
+#     dinames(gene_cna_t) <- list(NULL, shared_genes)
+# setattr prevent from creating unneccessary object copies.
+setattr(gene_cna_t, 'dimnames', list(NULL, shared_genes))
 
 gol_ratio_table <- as.data.table(aaply(
   gene_cna_t,
@@ -37,5 +39,4 @@ gol_ratio_table <- as.data.table(aaply(
 
 setkeyv(gene_exp, c("GENE"))
 gene_exp_t <- t(gene_exp[shared_genes, all_samples, with=FALSE])
-dimnames(gene_exp_t)[[1]] <- NULL
-dimnames(gene_exp_t)[[2]] <- shared_genes
+setattr(gene_exp_t, 'dimnames', list(NULL, shared_genes))
