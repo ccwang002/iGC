@@ -3,7 +3,8 @@
 #' @export
 find_cna_driven_gene <- function(
   gene_cna, gene_exp,
-  gain_ratio = 0.2, loss_ratio = 0.2
+  gain_ratio = 0.2, loss_ratio = 0.2,
+  progress = TRUE, progress_width = 32
 ) {
   all_samples <- colnames(gene_cna)[-1]
   # get shared genes

@@ -1,14 +1,25 @@
 #' @import data.table
 #' @import plyr
 #' @export
-create_gene_exp <- function(sample_desc, read_fun = NULL, ...) {
+create_gene_exp <- function(sample_desc, read_fun = NULL, progress = TRUE, progress_width = 48, ...) {
   if (is.null(read_fun)) {
     read_fun <- read_gene_exp
   }
   # use first_ge to obtain gene exp list
   ge_filepaths <- sample_desc$GE_filepath
-  first_ge <- read_fun(ge_filepaths[1])
-  raw_dfs <- alply(ge_filepaths, 1, read_fun, ..., .expand = FALSE, .progress = "time")
+  first_ge <- read_fun(ge_filepaths[1], ...)
+
+  # make the progress bar width smaller
+  if (progress) {
+    progress_opt <- "time"
+    old_width_option <- options(width = progress_width)
+  } else {
+    progress_opt <- "none"
+  }
+  raw_dfs <- alply(ge_filepaths, 1, read_fun, ..., .expand = FALSE, .progress = progress_opt)
+  # restore old width option
+  if (progress) options(old_width_option)
+
   # TODO: remove magic [[2]]
   df <- as.data.table(llply(raw_dfs, function(df){df[[2]]}))
   setnames(df, seq_len(ncol(df)), sample_desc$Sample)

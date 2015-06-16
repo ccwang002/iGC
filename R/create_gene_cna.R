@@ -4,7 +4,9 @@ create_gene_cna <- function(
   sample_desc,
   cna.gain.threshold = log(2.5, 2) - 1,
   cna.loss.threshold = log(1.5, 2) - 1,
-  read_fun = NULL
+  read_fun = NULL,
+  progress = TRUE, progress_width = 48,
+  ...
 ) {
   # TODO: don't ship our own hg19 DB
   data("hg19DBNM", package = "iGC", envir = environment())
@@ -14,14 +16,28 @@ create_gene_cna <- function(
   gene_wise_CNA <- unique(hg19DBNM[, .(Gene.Symbol)])
   orig_gene_order <- copy(gene_wise_CNA)
   setkey(gene_wise_CNA, Gene.Symbol) # add index
+
+  # make the progress bar width smaller
+  if (progress) {
+    progress_opt <- "time"
+    old_width_option <- options(width = progress_width)
+  } else {
+    progress_opt <- "none"
+  }
   plyr::m_ply(
-    sample_desc, read_cna_sample,
+    sample_desc[, .(Sample, CNA_filepath)],
+    read_cna_sample,
     gene_wise_CNA = gene_wise_CNA,
     gain_th = cna.gain.threshold,
     loss_th = cna.loss.threshold,
-    read_fun = NULL,
-    .progress = 'time'
+    progress = progress,
+    read_fun = read_fun,
+    ...,
+    .progress = progress_opt
   )
+  # restore old width option
+  if (progress) options(old_width_option)
+
   setkey(gene_wise_CNA, NULL)  # remove the index
   # restore the order
   gene_wise_CNA[match(orig_gene_order[[1]], gene_wise_CNA[[1]])]
@@ -35,13 +51,14 @@ read_cna <- function(cna_filepath) {
 read_cna_sample <- function(
   Sample, CNA_filepath,
   read_fun = NULL, gene_wise_CNA,
-  gain_th, loss_th, ...
+  gain_th, loss_th,
+  progress = TRUE, ...
 ) {
-  cat("Sample:", Sample)
+  if (progress) cat("Sample:", Sample)
   if (is.null(read_fun)) {
     read_fun <- read_cna
   }
-  cna <- read_fun(CNA_filepath)
+  cna <- read_fun(CNA_filepath, ...)
   gene_wise_CNA[, c(Sample):=0]
   for(cna_ix in seq_len(nrow(cna))) {
     cna_val <- cna[cna_ix, c(Segment_Mean)][[1]]
