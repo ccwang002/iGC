@@ -64,12 +64,12 @@ find_cna_driven_gene <- function(
         g_normal_mask <- normal_mask[, c(gene)]
         g_loss_mask <- loss_mask[, c(gene)]
 
-        g_gain_exp <- g_exp[g_gain_mask]
-        g_normal_exp <- g_exp[g_normal_mask]
-        g_loss_exp <- g_exp[g_loss_mask]
+        g_gain_exp <- na.omit(g_exp[g_gain_mask])
+        g_normal_exp <- na.omit(g_exp[g_normal_mask])
+        g_loss_exp <- na.omit(g_exp[g_loss_mask])
 
         if (cna_type == 'gain') {
-          if (length(g_gain_exp) == num_samples) {
+          if (length(g_gain_exp) <= 1 || length(g_loss_exp) <= 1) {
             p_value <- NA
             vs_rest_exp_diff <- NA
           } else {
@@ -77,7 +77,7 @@ find_cna_driven_gene <- function(
             vs_rest_exp_diff <- mean(g_gain_exp) - mean(c(g_normal_exp, g_loss_exp))
           }
         } else {
-          if (length(g_loss_exp) == num_samples) {
+          if (length(g_loss_exp) <= 1 || length(g_gain_exp) <= 1) {
             p_value <- NA
             vs_rest_exp_diff <- NA
           } else {
@@ -90,9 +90,9 @@ find_cna_driven_gene <- function(
           GENE = gene,
           p_value = p_value,
           gol_ratio_table[gene, !"GENE", with=FALSE],
-          gain_exp_mean = mean(g_gain_exp, na.rm = TRUE),
-          normal_exp_mean = mean(g_normal_exp, na.rm = TRUE),
-          loss_exp_mean = mean(g_loss_exp, na.rm = TRUE),
+          gain_exp_mean = mean(g_gain_exp),
+          normal_exp_mean = mean(g_normal_exp),
+          loss_exp_mean = mean(g_loss_exp),
           vs_rest_exp_diff = vs_rest_exp_diff
         )
       },
