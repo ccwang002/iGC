@@ -60,11 +60,11 @@ head(sample_desc_alt)
 Third, we apply the `ListGeneExp` function to create an overall gene expression list of entire input samples. The output file will be saved as GeneExp.rda.
 
 ```{r}
-gene_exp <- create_gene_exp(sample_desc, progress = FALSE, skip = 1)
+gene_exp <- create_gene_exp(sample_desc, progress = FALSE)
 gene_exp[GENE %in% c('TP53', 'BRCA1', 'NFKB1'), 1:10, with=FALSE]
 ```
 
-```{r, eval=TRUE}
+```{r, eval=FALSE}
 gene_exp <- create_gene_exp(
   sample_desc,
   read_fun = read.table,
