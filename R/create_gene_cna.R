@@ -1,3 +1,8 @@
+#' Load and map CNA gain/loss by human gene location
+#'
+#' @param sample_desc data.table object created by \link{create_sample_desc}.
+#' @param read_fun Custom reader function, see its own section for more detail.
+#'
 #' @import data.table
 #' @export
 create_gene_cna <- function(
