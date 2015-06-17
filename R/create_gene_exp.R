@@ -5,9 +5,7 @@ create_gene_exp <- function(sample_desc, read_fun = NULL, progress = TRUE, progr
   if (is.null(read_fun)) {
     read_fun <- read_gene_exp
   }
-  # use first_ge to obtain gene exp list
   ge_filepaths <- sample_desc$GE_filepath
-  first_ge <- read_fun(ge_filepaths[1], ...)
 
   # make the progress bar width smaller
   if (progress) {
@@ -20,11 +18,9 @@ create_gene_exp <- function(sample_desc, read_fun = NULL, progress = TRUE, progr
   # restore old width option
   if (progress) options(old_width_option)
 
-  # TODO: remove magic [[2]]
   df <- as.data.table(llply(raw_dfs, function(df){df[[2]]}))
   setnames(df, seq_len(ncol(df)), sample_desc$Sample)
-  df$GENE <- first_ge[[1]]
-  # row.names(df) <- ge[[1]]
+  df$GENE <- raw_dfs[[1]][[1]]  # gene names from the parsed output of the first sample
   setcolorder(df, c("GENE", sample_desc$Sample))
   df
 }
