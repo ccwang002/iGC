@@ -44,7 +44,8 @@
 #'   sample_root = '/path/to/sample'
 #' )
 #'
-#' ## Read the example desc. CSV file
+#'
+#' ## Create by reading the sample desc. CSV file
 #'
 #' sample_desc_pth <- system.file("extdata", "sample_desc.csv", package = "iGC")
 #' sample_desc <- create_sample_desc(sample_desc_pth)
@@ -54,6 +55,7 @@
 #' ## Read a external description and append the given file paths
 #' create_sample_desc('/path/to/desc.csv', sample_root='/path/to/sample/root')
 #' }
+#'
 #' @note It's a good practice to specify absolute file paths. One could convert
 #'   the relative file paths by passing \code{sample_root}.
 #'
