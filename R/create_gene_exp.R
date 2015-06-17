@@ -40,7 +40,7 @@ read_gene_exp <- function(ge_filepath, ...) {
   #   ge_filepath, header = FALSE, skip = 2,
   #   colClasses = c("character", "double"), na.strings=c("null")
   # )
-  gene_exp
+  as.data.table(gene_exp)
 }
 
 
