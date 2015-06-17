@@ -92,7 +92,7 @@ create_sample_desc <- function(
   } else {
     sample_desc <- fread(sample_desc_filepath, sep = ",", header = TRUE)
     sample_root <- dirname(sample_desc_filepath)
-    if (is.null(sample_root)) {
+    if (!is.null(sample_root)) {
       sample_desc$CNA_filepath <- file.path(sample_root, sample_desc$CNA_filepath)
       sample_desc$GE_filepath <- file.path(sample_root, sample_desc$GE_filepath)
     }
