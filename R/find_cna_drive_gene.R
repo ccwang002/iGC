@@ -70,7 +70,7 @@ find_cna_driven_gene <- function(
         g_loss_exp <- na.omit(g_exp[g_loss_mask])
 
         if (cna_type == 'gain') {
-          if (length(g_gain_exp) <= 1 || length(g_loss_exp) <= 1) {
+          if (length(g_gain_exp) <= 1 || length(c(g_normal_exp, g_loss_exp)) <= 1) {
             p_value <- NA
             vs_rest_exp_diff <- NA
           } else {
@@ -78,7 +78,7 @@ find_cna_driven_gene <- function(
             vs_rest_exp_diff <- mean(g_gain_exp) - mean(c(g_normal_exp, g_loss_exp))
           }
         } else {
-          if (length(g_loss_exp) <= 1 || length(g_gain_exp) <= 1) {
+          if (length(g_loss_exp) <= 1 || length(c(g_normal_exp, g_gain_exp)) <= 1) {
             p_value <- NA
             vs_rest_exp_diff <- NA
           } else {
