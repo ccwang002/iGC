@@ -99,6 +99,6 @@ read_cna_sample <- function(
       .(Gene.Symbol)][[1]])
     # TODO: judge by transcript, count 1 and -1, the more wins
     # Overwrite previous record if any
-    gene_wise_CNA[genes_overlapped, c(Sample):=gol]
+    gene_wise_CNA[genes_overlapped, Sample:=gol, with=FALSE]
   }
 }
