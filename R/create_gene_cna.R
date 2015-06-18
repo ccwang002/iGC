@@ -20,6 +20,8 @@ create_gene_cna <- function(
   # TODO: force no custom column names
   gene_wise_CNA <- unique(hg19DBNM[, .(Gene.Symbol)])
   orig_gene_order <- copy(gene_wise_CNA)
+  # allocate all sample columns first
+  gene_wise_CNA[, sample_desc$Sample:=0, with=FALSE]
   setkey(gene_wise_CNA, Gene.Symbol) # add index
 
   # make the progress bar width smaller
@@ -64,7 +66,6 @@ read_cna_sample <- function(
     read_fun <- read_cna
   }
   cna <- read_fun(CNA_filepath, ...)
-  gene_wise_CNA[, c(Sample):=0]
   for(cna_ix in seq_len(nrow(cna))) {
     cna_val <- cna[cna_ix, c(Segment_Mean)][[1]]
     if (cna_val > gain_th) {
