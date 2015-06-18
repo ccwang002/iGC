@@ -97,7 +97,7 @@ my_cna_reader <- function(cna_filepath) {
   cna
 }
 
-gain_loss = log2(c(2.5, 1.5)) - 1
+gain_loss = log2(c(2.4, 1.6)) - 1
 gene_cna <- create_gene_cna(
   as.data.table(sample_desc),
   cna.gain.threshold = gain_loss[1], cna.loss.threshold = gain_loss[2],
