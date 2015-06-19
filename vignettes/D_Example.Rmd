@@ -95,7 +95,7 @@ gene_cna[Gene.Symbol %in% c('TP53', 'BRCA1', 'NFKB1'), 1:10, with=FALSE]
 gene_cna <- create_gene_cna(
   sample_desc,
   cna.gain.threshold = gain_loss[1], cna.loss.threshold = gain_loss[2],
-  progress = FALSE, progress_width = 60,
+  progress = TRUE, progress_width = 60,
   read_fun = data.table::fread,
   sep = '\t',
   header = TRUE
