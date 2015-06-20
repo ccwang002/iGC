@@ -22,7 +22,7 @@ create_gene_cna <- function(
   setkeyv(modified_hg19, c("Gene.Symbol", "Chromosome", "Start", "Stop"))
 
   # TODO: force no custom column names
-  all_genes <- unique(modified_hg19[, .(Gene.Symbol)])
+  gene_wise_CNA <- unique(modified_hg19[, .(Gene.Symbol)])
   orig_gene_order <- copy(gene_wise_CNA)
   # allocate all sample columns first
   gene_wise_CNA[, sample_desc$Sample:=0, with=FALSE]
@@ -37,7 +37,7 @@ create_gene_cna <- function(
   }
   plyr::m_ply(
     sample_desc[, .(Sample, CNA_filepath)],
-    process_cna_per_sample,
+    process_cna_per_sample_orig,
     gene_wise_CNA = gene_wise_CNA,
     gene_db = modified_hg19,
     gain_th = cna.gain.threshold,
@@ -60,7 +60,7 @@ read_cna <- function(cna_filepath) {
   cna
 }
 
-process_cna_per_sample <- function(
+process_cna_per_sample_orig <- function(
   Sample, CNA_filepath,
   read_fun = NULL, gene_wise_CNA = NULL, gene_db = NULL,
   gain_th, loss_th,
@@ -98,6 +98,6 @@ process_cna_per_sample <- function(
       .(Gene.Symbol)][[1]])
     # TODO: judge by transcript, count 1 and -1, the more wins
     # Overwrite previous record if any
-    gene_wise_CNA[genes_overlapped, Sample:=gol, with=FALSE]
+    gene_wise_CNA[genes_overlapped, Sample:=cna[cna_ix, .(gol)][[1]], with=FALSE]
   }
 }
