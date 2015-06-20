@@ -9,12 +9,12 @@ find_cna_driven_gene <- function(
   all_samples <- colnames(gene_cna)[-1]
   # get shared genes
   shared_genes <- intersect(
-    gene_cna[, .(Gene.Symbol)][[1]],
+    gene_cna[, .(GENE)][[1]],
     gene_exp[, .(GENE)][[1]]
   )
 
   # transpose so columns to be gene-wise, easier to compute
-  setkeyv(gene_cna, c("Gene.Symbol"))
+  setkeyv(gene_cna, c("GENE"))
   gene_cna_t <- t(gene_cna[shared_genes, all_samples, with=FALSE])
   # see data.table's setattr doc page.
   # The following equals to
