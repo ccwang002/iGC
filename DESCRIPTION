@@ -15,9 +15,10 @@ URL: http://github.com/ccwang002/iGC
 BugReports: http://github.com/ccwang002/iGC/issues
 Suggests: BiocStyle, knitr, rmarkdown
 VignetteBuilder: knitr
+Suggests:
+    doMC
 Imports:
     plyr,
-    data.table,
-    stringr
+    data.table
 Depends: R (>= 3.2.0)
 LazyData: true
