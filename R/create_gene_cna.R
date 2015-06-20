@@ -15,11 +15,14 @@ create_gene_cna <- function(
 ) {
   # TODO: don't ship our own hg19 DB
   data("hg19DBNM", package = "iGC", envir = environment())
-  setkeyv(hg19DBNM, c("Gene.Symbol", "Chromosome", "Start", "Stop"))
-  # hg19DBNM <- data.table(hg19DBNM)
+  modified_hg19 <- hg19DBNM[
+    , list(Start=min(.SD$Start), Stop=max(.SD$Stop)),
+    by='Gene.Symbol,Chromosome'
+  ]
+  setkeyv(modified_hg19, c("Gene.Symbol", "Chromosome", "Start", "Stop"))
 
   # TODO: force no custom column names
-  gene_wise_CNA <- unique(hg19DBNM[, .(Gene.Symbol)])
+  all_genes <- unique(modified_hg19[, .(Gene.Symbol)])
   orig_gene_order <- copy(gene_wise_CNA)
   # allocate all sample columns first
   gene_wise_CNA[, sample_desc$Sample:=0, with=FALSE]
@@ -36,6 +39,7 @@ create_gene_cna <- function(
     sample_desc[, .(Sample, CNA_filepath)],
     process_cna_per_sample,
     gene_wise_CNA = gene_wise_CNA,
+    gene_db = modified_hg19,
     gain_th = cna.gain.threshold,
     loss_th = cna.loss.threshold,
     progress = progress,
@@ -58,7 +62,7 @@ read_cna <- function(cna_filepath) {
 
 process_cna_per_sample <- function(
   Sample, CNA_filepath,
-  read_fun = NULL, gene_wise_CNA,
+  read_fun = NULL, gene_wise_CNA = NULL, gene_db = NULL,
   gain_th, loss_th,
   progress = TRUE, ...
 ) {
@@ -67,19 +71,13 @@ process_cna_per_sample <- function(
     read_fun <- read_cna
   }
   cna <- read_fun(CNA_filepath, ...)
-  for(cna_ix in seq_len(nrow(cna))) {
-    cna_val <- cna[cna_ix, c(Segment_Mean)][[1]]
-    if (cna_val > gain_th) {
-      gol <- 1
-    } else if(cna_val < loss_th) {
-      gol <- -1
-    } else {
-      gol <- 0
-      next   # early fail, don't care about no gain-or-loss records
-    }
-    cur_chr <- cna[cna_ix, .(Chromosome)][[1]]
+  cna[, gol:=0]
+  cna[Segment_Mean > gain_th, gol:= 1]
+  cna[Segment_Mean < loss_th, gol:= -1]
 
-    genes_on_same_chromosome <- hg19DBNM[Chromosome == cur_chr]
+  for(cna_ix in seq_len(nrow(cna))) {
+    cur_chr <- cna[cna_ix, .(Chromosome)][[1]]
+    genes_on_same_chromosome <- gene_db[Chromosome == cur_chr]
     # CNA    a        ++++++++++++++
     # Gene   A     >>>>>-->>>>>>>->>>>
     #   exon 1     T&T                                T
