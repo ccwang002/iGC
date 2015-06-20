@@ -4,7 +4,8 @@
 find_cna_driven_gene <- function(
   gene_cna, gene_exp,
   gain_ratio = 0.2, loss_ratio = 0.2,
-  progress = TRUE, progress_width = 32
+  progress = TRUE, progress_width = 32,
+  parallel = FALSE
 ) {
   all_samples <- colnames(gene_cna)[-1]
   # get shared genes
@@ -23,15 +24,21 @@ find_cna_driven_gene <- function(
   setattr(gene_cna_t, 'dimnames', list(NULL, shared_genes))
 
   cat("Computing gain/loss sample ratio ...\n")
-  gol_ratio_table <- as.data.table(aaply(
-    gene_cna_t,
-    2,
-    function(one_gene) {
-      c(Gain = sum(one_gene == 1),
-        Loss = sum(one_gene == -1),
-        Normal = sum(one_gene == 0))},
-    .progress = progress_text(width=32)
-  ) / length(all_samples))
+  num_sample <- length(all_samples)
+  gol_ratio_table <- data.table(
+    Gain = colSums(gene_cna_t == 1) / num_sample,
+    Loss = colSums(gene_cna_t == -1) / num_sample,
+    Normal = colSums(gene_cna_t == 0) / num_sample
+  )
+  # gol_ratio_table <- as.data.table(aaply(
+  #   gene_cna_t,
+  #   2,
+  #   function(one_gene) {
+  #     c(Gain = sum(one_gene == 1),
+  #       Loss = sum(one_gene == -1),
+  #       Normal = sum(one_gene == 0))},
+  #   .progress = progress_text(width=progress_width)
+  # ) / length(all_samples))
   gol_ratio_table[, GENE:=shared_genes]
   setkeyv(gol_ratio_table, "GENE")
 
@@ -98,7 +105,8 @@ find_cna_driven_gene <- function(
         )
       },
       .id = NULL,
-      .progress = progress_text(width=32)
+      .progress = progress_text(width=progress_width),
+      .parallel = parallel
     ))
     dt[, fdr := p.adjust(p_value, method = "fdr")]
     setcolorder(
