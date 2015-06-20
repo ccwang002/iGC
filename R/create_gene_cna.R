@@ -15,7 +15,8 @@ create_gene_cna <- function(
 ) {
   # TODO: don't ship our own hg19 DB
   data("hg19DBNM", package = "iGC", envir = environment())
-  hg19DBNM <- data.table(hg19DBNM)
+  setkeyv(hg19DBNM, c("Gene.Symbol", "Chromosome", "Start", "Stop"))
+  # hg19DBNM <- data.table(hg19DBNM)
 
   # TODO: force no custom column names
   gene_wise_CNA <- unique(hg19DBNM[, .(Gene.Symbol)])
@@ -33,7 +34,7 @@ create_gene_cna <- function(
   }
   plyr::m_ply(
     sample_desc[, .(Sample, CNA_filepath)],
-    read_cna_sample,
+    process_cna_per_sample,
     gene_wise_CNA = gene_wise_CNA,
     gain_th = cna.gain.threshold,
     loss_th = cna.loss.threshold,
@@ -55,7 +56,7 @@ read_cna <- function(cna_filepath) {
   cna
 }
 
-read_cna_sample <- function(
+process_cna_per_sample <- function(
   Sample, CNA_filepath,
   read_fun = NULL, gene_wise_CNA,
   gain_th, loss_th,
