@@ -83,7 +83,7 @@ create_gene_cna <- function(
     progress_opt <- "none"
   }
 
-  joint_gene_cna <- as.data.table(alply(
+  joint_gene_cna <- as.data.table(plyr::alply(
     sample_desc$CNA_filepath, 1,
     process_cna_per_sample,
     gain_th = gain_threshold,
@@ -162,6 +162,7 @@ judge_gain_or_loss <- function(gain_loss) {
 }
 
 
+#' @import data.table
 read_cna_tcga <- function(cna_filepath) {
   cna <- fread(cna_filepath, sep = '\t', header = TRUE)
   cna
