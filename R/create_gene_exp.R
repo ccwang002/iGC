@@ -1,6 +1,6 @@
 #' Create an joint gene expression table of all samples
 #'
-#' The function reads in all sample gene expression data by given sample
+#' The function reads in all sample gene expression data given by sample
 #' description \code{sample_desc} and return a joint expression table of all
 #' given genes across samples.
 #'

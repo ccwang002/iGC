@@ -1,8 +1,54 @@
-#' Load and map CNA gain/loss by human gene location
+#' Load and map CNA gain/loss onto human gene location by genome reference
 #'
-#' @param sample_desc data.table object created by \link{create_sample_desc}.
+#' The function reads in all sample CNA data given by sample description
+#' \code{sample_desc} and return a joint CNA gain/loss table based on gene
+#' regions across samples.
+#'
+#' A gene is considered to have CNA gain if the overlapped CNA record expression
+#' is higher than the given threshold. Similarly, a gene is considered CNA loss
+#' if the overlapped CNA record is lower than the given threshold. If multiple
+#' CNA records map onto the same gene region with both gain and loss, majority
+#' wins. If none of the records map to the gene, NA is given.
+#'
+#' By default it assumes the data to be of TCGA level 3 file format. For other
+#' data (e.g. raw data or other experiments from GEO), one should implement a
+#' custom reader function that accepts the filepath as the first argument. See
+#' section \emph{Custom reader function} for full specification.
+#'
+#' Currently the package ships a custom genome reference hg19, \link{hg19DBNM},
+#' for gene region look up. Each gene's region is defined by the widest splicing
+#' form it has in NCBI curated records. The defined region includes intron
+#' regions. This limitation may change in the future.
+#'
+#' @section Custom reader function: Custom reader function is given by
+#'   \code{read_fun = your_reader_fun}. It takes the filepath as the first
+#'   argument and return a data.table with at least the following four columns:
+#'   \code{Chromosome}, \code{Start}, \code{End}, and \code{expression} of type
+#'   character, integer, integer and double respectively.
+#'
+#'   Rest of the arguments \code{create_gene_cna(...)} will be passed to this
+#'   reader function.
+#'
+#' @param sample_desc \link[data.table]{data.table} object created by
+#'   \link{create_sample_desc}.
+#' @param gain_threshold CNA expression above this will be considered as gain
+#'   region. By default \eqn{\log_2{2.5} - 1}
+#' @param loss_threshold CNA expression above this will be considered as loss
+#'   region. By default \eqn{\log_2{1.5} - 1}
 #' @param read_fun Custom reader function, see its own section for more detail.
+#' @param progress Whether to display a progress bar. By default \code{TRUE}.
+#' @param progress_width The text width of the shown progress bar. By default is
+#'   48 chars wide.
+#' @param parallel Enable parallelism by plyr. One has to specify a parallel
+#'   engine beforehand. See example for more information.
+#' @param ... Arguments passed to the custom reader function specified in
+#'   \code{read_fun}.
 #'
+#' @return data.table of CNA gain/loss on each gene region for all samples,
+#'   whose rows represent regions of genes and columns are sample names. First
+#'   column \code{GENE} contains the corresponding gene names.
+#'
+#' @seealso \code{\link[utils]{read.table}} and \code{\link[data.table]{fread}}
 #' @import data.table
 #' @export
 create_gene_cna <- function(
