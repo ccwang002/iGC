@@ -2,7 +2,7 @@
 #'
 #' The iGC package is used to identify CNA-driven differentially expressed genes.
 #' The iGC package provides four categories of important functions:
-#' create_sample_desc, create_gene_exp, creat_gene_cna and find_cna_drive_gene.
+#' create_sample_desc, create_gene_exp, faster_gene_cna and find_cna_drive_gene.
 #'
 #' @section create_sample_desc:
 #' The create_sample_desc function is provided for creating sample description table containing all required inputs.
@@ -12,8 +12,8 @@
 #' The create_gene_exp function is used to rearrange the input gene expression files to a gene expression
 #' list of entire samples.
 #'
-#' @section creat_gene_cna function:
-#' The creat_gene_cna function maps CNA data to human genes and then defines the mapped human genes as CN gain or loss
+#' @section faster_gene_cna function:
+#' The faster_gene_cna function maps CNA data to human genes and then defines the mapped human genes as CN gain or loss
 #' based on the CN threshold, whose default values are set as 2.5 for gain and 1.5 for loss. These mapped genes will
 #' be assigned values in +1, -1 or 0, where +1 stands for CNA-gain, -1 stands for CNA-loss and 0 stands for neutral.
 #'
