@@ -26,18 +26,6 @@ biocLite("iGC")
 library(iGC)
 ```
 
-## Load hg19-RefSeg
-
-Next, we load the human genome reference hg19 (hg19DBNM.rda) and check the paths of example dataset and sample ID mapping file.
-
-```{r, eval=FALSE}
-data(hg19DBNM)
-system.file("extdata/GE", package = "iGC")
-system.file("extdata/CNA", package = "iGC")
-system.file("extdata", "FILE_SAMPLE_MAP.txt", package = "iGC")
-```
-
-
 ## Generate Sample Description
 
 ```{r}
@@ -80,33 +68,35 @@ gene_exp <- create_gene_exp(
 
 Subsequently, we run `CNAtoGene` function to map CNA data to human genes using human genome version 19 as reference. For each mapped human genes, the input samples are divided into CNA-gain (G), CNA-loss (L), and neutral (N) groups based on its CNA statuses, whose default values are set as 2.5 for gain and 1.5 for loss. The output file will be saved as CNAtoGeneList.rda.
 
+
 ```{r}
 gain_loss = log2(c(2.7, 1.5)) - 1
+gene_cna <- faster_gene_cna(
+  sample_desc,
+  gain_threshold = gain_loss[[1]], loss_threshold = gain_loss[[2]],
+  read_fun = data.table::fread, 
+  sep = '\t', header = TRUE,
+  progress = FALSE
+)
+gene_cna[GENE %in% c('TP53', 'BRCA1', 'NFKB1'), 1:10, with=FALSE]
+```
+
+```{r, eval=FALSE}
 gene_cna <- create_gene_cna(
   sample_desc,
   cna.gain.threshold = gain_loss[[1]], cna.loss.threshold = gain_loss[[2]],
-  progress = TRUE
+  progress = TRUE, progress_width = 60,
 )
 setnames(gene_cna, c("Gene.Symbol"), c("GENE"))
 ```
 
-
 ```{r, eval=FALSE}
-gene_cna <- faster_gene_cna(
-  sample_desc,
-  gain_threshold = gain_loss[[1]], loss_threshold = gain_loss[[2]],
-  progress = TRUE, progress_width = 60,
-  read_fun = data.table::fread,
-  sep = '\t',
-  header = TRUE
-)
-
 doMC::registerDoMC(cores = 4)
 gene_cna <- faster_gene_cna(
   sample_desc, gain_loss[[1]], gain_loss[[2]], parallel = TRUE
 )
-gene_cna[GENE %in% c('TP53', 'BRCA1', 'NFKB1'), 1:10, with=FALSE]
 ```
+
 
 
 ## Identify CNA-driven differentially expressed genes using function `CNAdrivenGene`
@@ -115,11 +105,11 @@ Lastly, we employ `CNAdrivenGene` function to identify differentially expressed 
 That is, only genes showing CNAs in at least 20% of the samples will be analyzed further, and the threshold can be changed by users. The GE levels are evaluated by the Student’s t-test and Wilcoxon rank sum test. False discovery rate, p-value, associated statistics are included in output files, and gene set enrichment analysis (GSEA) can be performed directly.
 
 ```{r}
-system.time(cna_driven_genes_orig <- find_cna_driven_gene(
+cna_driven_genes <- find_cna_driven_gene(
   gene_cna, gene_exp,
   gain_ratio = 0.15, loss_ratio = 0.15,
-  progress = FALSE, parallel = TRUE
-))
+  progress = FALSE, parallel = FALSE
+)
 head(cna_driven_genes$gain_driven)
 head(cna_driven_genes$loss_driven)
 head(cna_driven_genes$both)
