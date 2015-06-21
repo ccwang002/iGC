@@ -54,8 +54,8 @@ find_cna_driven_gene <- function(
     } else {
       stop("Unknown cna_type, should be either 'gain' or 'loss'")
     }
-    cna_driven_exp <- gene_exp_t[, c(cna_driven_genes)]
-    cna_driven_cna <- gene_cna_t[, c(cna_driven_genes)]
+    cna_driven_exp <- gene_exp_t[, c(cna_driven_genes), drop=FALSE]
+    cna_driven_cna <- gene_cna_t[, c(cna_driven_genes), drop=FALSE]
 
     gain_mask <- cna_driven_cna == 1
     normal_mask <- cna_driven_cna == 0
