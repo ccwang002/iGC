@@ -71,7 +71,7 @@ Subsequently, we run `CNAtoGene` function to map CNA data to human genes using h
 
 ```{r}
 gain_loss = log2(c(2.7, 1.5)) - 1
-gene_cna <- faster_gene_cna(
+gene_cna <- create_gene_cna(
   sample_desc,
   gain_threshold = gain_loss[[1]], loss_threshold = gain_loss[[2]],
   read_fun = data.table::fread, 
@@ -82,21 +82,11 @@ gene_cna[GENE %in% c('TP53', 'BRCA1', 'NFKB1'), 1:10, with=FALSE]
 ```
 
 ```{r, eval=FALSE}
-gene_cna <- create_gene_cna(
-  sample_desc,
-  cna.gain.threshold = gain_loss[[1]], cna.loss.threshold = gain_loss[[2]],
-  progress = TRUE, progress_width = 60,
-)
-setnames(gene_cna, c("Gene.Symbol"), c("GENE"))
-```
-
-```{r, eval=FALSE}
 doMC::registerDoMC(cores = 4)
-gene_cna <- faster_gene_cna(
+gene_cna <- create_gene_cna(
   sample_desc, gain_loss[[1]], gain_loss[[2]], parallel = TRUE
 )
 ```
-
 
 
 ## Identify CNA-driven differentially expressed genes using function `CNAdrivenGene`

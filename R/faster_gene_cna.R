@@ -5,7 +5,7 @@
 #'
 #' @import data.table
 #' @export
-faster_gene_cna <- function(
+create_gene_cna <- function(
     sample_desc,
     gain_threshold = log2(2.5) - 1,
     loss_threshold = log2(1.5) - 1,
