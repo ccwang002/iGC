@@ -23,22 +23,13 @@ find_cna_driven_gene <- function(
   # setattr prevent from creating unneccessary object copies.
   setattr(gene_cna_t, 'dimnames', list(NULL, shared_genes))
 
-  cat("Computing gain/loss sample ratio ...\n")
+  if (progress) cat("Computing gain/loss sample ratio ...\n")
   num_sample <- length(all_samples)
   gol_ratio_table <- data.table(
     Gain = colSums(gene_cna_t == 1) / num_sample,
     Loss = colSums(gene_cna_t == -1) / num_sample,
     Normal = colSums(gene_cna_t == 0) / num_sample
   )
-  # gol_ratio_table <- as.data.table(aaply(
-  #   gene_cna_t,
-  #   2,
-  #   function(one_gene) {
-  #     c(Gain = sum(one_gene == 1),
-  #       Loss = sum(one_gene == -1),
-  #       Normal = sum(one_gene == 0))},
-  #   .progress = progress_text(width=progress_width)
-  # ) / length(all_samples))
   gol_ratio_table[, GENE:=shared_genes]
   setkeyv(gol_ratio_table, c("GENE"))
 
@@ -47,6 +38,12 @@ find_cna_driven_gene <- function(
   setattr(gene_exp_t, 'dimnames', list(NULL, shared_genes))
 
   exp_grouptest_driven_by_cna <- function(cna_type = 'gain') {
+    if (progress) {
+        progress_bar <- progress_text(width = progress_width)
+    } else {
+        progress_bar <- "none"
+    }
+
     if (cna_type == 'gain') {
       cna_driven_genes <- gol_ratio_table[Gain > gain_ratio, .(GENE)][[1]]
     } else if (cna_type == 'loss') {
@@ -105,7 +102,7 @@ find_cna_driven_gene <- function(
         )
       },
       .id = NULL,
-      .progress = progress_text(width=progress_width),
+      .progress = progress_bar,
       .parallel = parallel
     ))
     fdr_adjusted_p <- p.adjust(cna_driven_dt$p_value, method = "fdr")
@@ -125,9 +122,9 @@ find_cna_driven_gene <- function(
     return(cna_driven_dt)
   }
 
-  cat("Computing CNA gain driven gene records ... \n")
+  if (progress) cat("Computing CNA gain driven gene records ... \n")
   dt_gain <- exp_grouptest_driven_by_cna(cna_type = "gain")
-  cat("Computing CNA loss driven gene records ... \n")
+  if (progress) cat("Computing CNA loss driven gene records ... \n")
   dt_loss <- exp_grouptest_driven_by_cna(cna_type = "loss")
 
   # [.data.table requires key columns

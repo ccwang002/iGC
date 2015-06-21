@@ -46,7 +46,7 @@ faster_gene_cna <- function(
     gene_db = modified_hg19,
     all_genes = all_genes,
     ...,
-    .progress = "time", .parallel = parallel
+    .progress = progress_opt, .parallel = parallel
   ))
 
   # restore old width option
