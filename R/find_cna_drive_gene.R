@@ -40,7 +40,7 @@ find_cna_driven_gene <- function(
   #   .progress = progress_text(width=progress_width)
   # ) / length(all_samples))
   gol_ratio_table[, GENE:=shared_genes]
-  setkeyv(gol_ratio_table, "GENE")
+  setkeyv(gol_ratio_table, c("GENE"))
 
   setkeyv(gene_exp, c("GENE"))
   gene_exp_t <- t(gene_exp[shared_genes, all_samples, with=FALSE])
@@ -63,7 +63,7 @@ find_cna_driven_gene <- function(
 
     num_samples <- length(all_samples)
 
-    dt <- as.data.table(adply(
+    cna_driven_dt <- as.data.table(adply(
       cna_driven_genes,
       1,
       function(gene) {
@@ -108,20 +108,21 @@ find_cna_driven_gene <- function(
       .progress = progress_text(width=progress_width),
       .parallel = parallel
     ))
-    dt[, fdr := p.adjust(p_value, method = "fdr")]
+    fdr_adjusted_p <- p.adjust(cna_driven_dt$p_value, method = "fdr")
+    set(cna_driven_dt, NULL, "fdr", fdr_adjusted_p)
     setcolorder(
-        dt,
-        c("GENE", "p_value", "fdr",
-          "Gain", "Normal", "Loss",
-          "gain_exp_mean", "normal_exp_mean", "loss_exp_mean",
-          "vs_rest_exp_diff")
+      cna_driven_dt,
+      c("GENE", "p_value", "fdr",
+        "Gain", "Normal", "Loss",
+        "gain_exp_mean", "normal_exp_mean", "loss_exp_mean",
+        "vs_rest_exp_diff")
     )
     setnames(
-        dt,
-        c("Gain", "Normal", "Loss"),
-        c("gain_sample_ratio", "normal_sample_ratio", "loss_sample_ratio")
+      cna_driven_dt,
+      c("Gain", "Normal", "Loss"),
+      c("gain_sample_ratio", "normal_sample_ratio", "loss_sample_ratio")
     )
-    return(dt)
+    return(cna_driven_dt)
   }
 
   cat("Computing CNA gain driven gene records ... \n")
