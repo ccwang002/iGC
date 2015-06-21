@@ -13,10 +13,8 @@ Description: This package is intended to identify differentially expressed genes
 License: GPL-2
 URL: http://github.com/ccwang002/iGC
 BugReports: http://github.com/ccwang002/iGC/issues
-Suggests: BiocStyle, knitr, rmarkdown
+Suggests: BiocStyle, knitr, rmarkdown, doMC
 VignetteBuilder: knitr
-Suggests:
-    doMC
 Imports:
     plyr,
     data.table
