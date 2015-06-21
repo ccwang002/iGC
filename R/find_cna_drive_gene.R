@@ -23,7 +23,7 @@ find_cna_driven_gene <- function(
   # setattr prevent from creating unneccessary object copies.
   setattr(gene_cna_t, 'dimnames', list(NULL, shared_genes))
 
-  if (progress) cat("Computing gain/loss sample ratio ...\n")
+  if (progress) message("Computing gain/loss sample ratio ...\n")
   num_sample <- length(all_samples)
   gol_ratio_table <- data.table(
     Gain = colSums(gene_cna_t == 1) / num_sample,
@@ -122,9 +122,9 @@ find_cna_driven_gene <- function(
     return(cna_driven_dt)
   }
 
-  if (progress) cat("Computing CNA gain driven gene records ... \n")
+  if (progress) message("Computing CNA gain driven gene records ... \n")
   dt_gain <- exp_grouptest_driven_by_cna(cna_type = "gain")
-  if (progress) cat("Computing CNA loss driven gene records ... \n")
+  if (progress) message("Computing CNA loss driven gene records ... \n")
   dt_loss <- exp_grouptest_driven_by_cna(cna_type = "loss")
 
   # [.data.table requires key columns
