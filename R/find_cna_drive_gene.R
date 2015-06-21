@@ -1,3 +1,38 @@
+#' Perform an integrated analysis of gene expression (GE) and copy number
+#' alteration (CNA)
+#'
+#' The function finds CNA-driven differentially expressed gene with p-value,
+#' false discovery rate, and associated statistics. The result will includes
+#' three tables which collects information for gain-, loss-, and both-driven
+#' genes.
+#'
+#' The gene is considered CNA-gain if the proportion of the sample exhibiting
+#' gain exceeds the threshold \code{gain_ratio}, that is, number of samples
+#' having \code{gain_loss} = 1. Reversely, the gene is considered CNA-loss if
+#' \%samples that \code{gain_loss} = -1 is below the threshold
+#' \code{loss_ratio}.
+#'
+#' When performing the p-test, sample grouping depends on the analysis scenario
+#' being either CNA-gain or CNA-loss driven. In CNA-gain driven scenario, two
+#' groups, CNA-gain and other samples, are made. In CNA-loss driven scenario,
+#' groups CNA-loss and the others are made. Genes appear in both scenario will
+#' be collected into a third table and excluded from their original tables.
+#'
+#' @param gene_cna Joint CNA table from \link{create_gene_cna}.
+#' @param gene_exp Joint gene expression table from \link{create_gene_exp}.
+#' @param gain_ratio Minimum proportion of the gain samples to be consider
+#'   CNA-gain. Default is 0.2.
+#' @param loss_ratio Minimum proportion of the loss samples to be consider
+#'   CNA-loss. Default is 0.2.
+#'
+#' @param progress Whether to display a progress bar. By default \code{TRUE}.
+#' @param progress_width The text width of the shown progress bar. By default is
+#'   48 chars wide.
+#' @param parallel Enable parallelism by plyr. One has to specify a parallel
+#'   engine beforehand. See example for more information.
+#'
+#' @return List of three data.table for CNA-driven scenarios: gain, loss, and both.
+#'
 #' @import data.table
 #' @import plyr
 #' @export
