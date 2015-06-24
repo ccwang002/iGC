@@ -9,13 +9,13 @@
 #' The gene is considered CNA-gain if the proportion of the sample exhibiting
 #' gain exceeds the threshold \code{gain_ratio}, that is, number of samples
 #' having \code{gain_loss} = 1. Reversely, the gene is considered CNA-loss if
-#' \%samples that \code{gain_loss} = -1 is below the threshold
+#' \%samples that \code{gain_loss} = -1 is beyond a given threshold
 #' \code{loss_ratio}.
 #'
-#' When performing the p-test, sample grouping depends on the analysis scenario
+#' When performing the t-test, sample grouping depends on the analysis scenario
 #' being either CNA-gain or CNA-loss driven. In CNA-gain driven scenario, two
 #' groups, CNA-gain and other samples, are made. In CNA-loss driven scenario,
-#' groups CNA-loss and the others are made. Genes appear in both scenario will
+#' group CNA-loss and the others are made. Genes appear in both scenario will
 #' be collected into a third table and excluded from their original tables.
 #'
 #' @param gene_cna Joint CNA table from \link{create_gene_cna}.
