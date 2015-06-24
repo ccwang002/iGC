@@ -80,6 +80,16 @@
 #' )
 #' gene_cna[GENE %in% c("BRCA2", "TP53", "SEMA5A"), ]
 #'
+#' \dontrun{
+#' ## To boost the speed, utilize parallelization
+#' doMC::registerDoMC(4)  # number of CPU cores
+#' gene_cna <- create_gene_cna(
+#'   sample_desc,
+#'   gain_threshold = log2(2.3) - 1, loss_threshold = log2(1.7) - 1,
+#'   read_fun = my_cna_reader,
+#'   parallel = TRUE
+#' )
+#' }
 #' @import data.table
 #' @export
 create_gene_cna <- function(
