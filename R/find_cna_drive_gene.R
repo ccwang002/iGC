@@ -44,10 +44,7 @@ find_cna_driven_gene <- function(
 ) {
   all_samples <- colnames(gene_cna)[-1]
   # get shared genes
-  shared_genes <- intersect(
-    gene_cna[, .(GENE)][[1]],
-    gene_exp[, .(GENE)][[1]]
-  )
+  shared_genes <- intersect(gene_cna[, .(GENE)][[1]], gene_exp[, .(GENE)][[1]])
 
   # transpose so columns to be gene-wise, easier to compute
   setkeyv(gene_cna, c("GENE"))
@@ -72,6 +69,7 @@ find_cna_driven_gene <- function(
   gene_exp_t <- t(gene_exp[shared_genes, all_samples, with=FALSE])
   setattr(gene_exp_t, 'dimnames', list(NULL, shared_genes))
 
+  # define a subroutine to re-use same part computing gain/loss driven genes
   exp_grouptest_driven_by_cna <- function(cna_type = 'gain') {
     if (progress) {
         progress_bar <- progress_text(width = progress_width)
@@ -95,6 +93,7 @@ find_cna_driven_gene <- function(
 
     num_samples <- length(all_samples)
 
+    # compute the p-value between gain(loss) vs rest and their avg. gene expression
     cna_driven_dt <- as.data.table(adply(
       cna_driven_genes,
       1,
@@ -157,8 +156,10 @@ find_cna_driven_gene <- function(
     return(cna_driven_dt)
   }
 
+  # use the subroutine
   if (progress) message("Computing CNA gain driven gene records ... \n")
   dt_gain <- exp_grouptest_driven_by_cna(cna_type = "gain")
+
   if (progress) message("Computing CNA loss driven gene records ... \n")
   dt_loss <- exp_grouptest_driven_by_cna(cna_type = "loss")
 
@@ -166,8 +167,8 @@ find_cna_driven_gene <- function(
   setkey(dt_gain, "GENE")
   setkey(dt_loss, "GENE")
 
+  # take out genes shown in both gain and loss table
   dt_both <- dt_gain[, .(GENE, p_value, fdr, vs_rest_exp_diff)][dt_loss, nomatch=0]
-  # dt_both <- merge(dt_gain[, .(GENE, p_value, fdr)], dt_loss, by="GENE", all=TRUE)
   setnames(
     dt_both,
     c("p_value", "fdr", "vs_rest_exp_diff",
@@ -189,6 +190,7 @@ find_cna_driven_gene <- function(
   setkey(dt_gain, NULL)
   setkey(dt_loss, NULL)
   setkey(dt_both, NULL)
+
   # sorted by ascending fdr
   setorderv(dt_gain, "fdr", 1, na.last=TRUE)
   setorderv(dt_loss, "fdr", 1, na.last=TRUE)
