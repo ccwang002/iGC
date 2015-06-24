@@ -66,36 +66,40 @@
 #' @import data.table
 #' @export
 create_sample_desc <- function(
-  sample_desc_filepath = NULL,
-  sample_names = NULL,
-  cna_filepaths = NULL,
-  ge_filepaths = NULL,
-  sample_root = NULL
+    sample_desc_filepath = NULL,
+    sample_names = NULL,
+    cna_filepaths = NULL,
+    ge_filepaths = NULL,
+    sample_root = NULL
 ) {
-  if(is.null(sample_desc_filepath)) {
-    if (any(sapply(list(sample_names, cna_filepaths, ge_filepaths), is.null))) {
-      stop("Unsufficient parameters (name, cna_pths, ge_pths) to create sample desc")
-    }
-    if (is.null(sample_root)) {
-      sample_desc <- data.table(
-        Sample = sample_names,
-        CNA_filepath = cna_filepaths,
-        GE_filepath = ge_filepaths
-      )
+    if(is.null(sample_desc_filepath)) {
+        if (any(sapply(list(
+            sample_names, cna_filepaths, ge_filepaths
+        ), is.null))) {
+            stop("Unsufficient parameters (name, cna_pths, ge_pths) to create sample desc")
+        }
+        if (is.null(sample_root)) {
+            sample_desc <- data.table(
+                Sample = sample_names,
+                CNA_filepath = cna_filepaths,
+                GE_filepath = ge_filepaths
+            )
+        } else {
+            sample_desc <- data.table(
+                Sample = sample_names,
+                CNA_filepath = file.path(sample_root, cna_filepaths),
+                GE_filepath = file.path(sample_root, ge_filepaths)
+            )
+        }
     } else {
-      sample_desc <- data.table(
-        Sample = sample_names,
-        CNA_filepath = file.path(sample_root, cna_filepaths),
-        GE_filepath = file.path(sample_root, ge_filepaths)
-      )
+        sample_desc <- fread(sample_desc_filepath, sep = ",", header = TRUE)
+        sample_root <- dirname(sample_desc_filepath)
+        if (!is.null(sample_root)) {
+            sample_desc$CNA_filepath <-
+                file.path(sample_root, sample_desc$CNA_filepath)
+            sample_desc$GE_filepath <-
+                file.path(sample_root, sample_desc$GE_filepath)
+        }
     }
-  } else {
-    sample_desc <- fread(sample_desc_filepath, sep = ",", header = TRUE)
-    sample_root <- dirname(sample_desc_filepath)
-    if (!is.null(sample_root)) {
-      sample_desc$CNA_filepath <- file.path(sample_root, sample_desc$CNA_filepath)
-      sample_desc$GE_filepath <- file.path(sample_root, sample_desc$GE_filepath)
-    }
-  }
-  sample_desc
+    sample_desc
 }
