@@ -13,6 +13,10 @@
 #'
 #' @inheritParams create_gene_cna
 #'
+#' @return data.table of CNA gain/loss on each gene region for all samples,
+#'   whose rows represent regions of genes and columns are sample names. First
+#'   column \code{GENE} contains the corresponding gene names.
+#'
 #' @seealso \code{\link{create_gene_cna}}
 #' @export
 #' @import data.table

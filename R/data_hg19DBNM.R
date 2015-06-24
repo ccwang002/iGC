@@ -17,5 +17,6 @@
 #'   \item{Gene.Symbol}{Gene name}
 #'   \item{Transcript}{RefSeq name}
 #' }
+#' @return data.table
 #' @source UCSC Genome Browser: \url{http://hgdownload.cse.ucsc.edu/downloads.html}
 "hg19DBNM"
