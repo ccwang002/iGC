@@ -10,6 +10,13 @@ Authors@R: c(
     person("Eric Y.", "Chuang", email = "chuangey@ntu.edu.tw", role = c("aut")))
 Description: This package is intended to identify differentially expressed genes driven by
     Copy Number Alterations from samples with both gene expression and CNA data.
+biocViews:
+    Software,
+    Biological Question, DifferentialExpression, GenomicVariation,
+    AssayDomain, CopyNumberVariation, GeneExpression,
+    ResearchField, Genetics,
+    Technology, Microarray, Sequencing,
+    WorkflowStep, MultipleComparison
 License: GPL-2
 URL: http://github.com/ccwang002/iGC
 BugReports: http://github.com/ccwang002/iGC/issues
