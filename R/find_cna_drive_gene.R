@@ -18,6 +18,8 @@
 #' groups CNA-loss and the others are made. Genes appear in both scenario will
 #' be collected into a third table and excluded from their original tables.
 #'
+#' See the vignette for usage of this function by a thorough example.
+#'
 #' @param gene_cna Joint CNA table from \link{create_gene_cna}.
 #' @param gene_exp Joint gene expression table from \link{create_gene_exp}.
 #' @param gain_ratio Minimum proportion of the gain samples to be consider

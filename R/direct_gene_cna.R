@@ -1,3 +1,19 @@
+#' Load the existed CNA gain/loss based on gene location.
+#'
+#' This function aims to complement \link{create_gene_cna}. Instead of mapping
+#' CNA records onto genes by genome reference, it reads the existed column that
+#' shows which gene each CNA lies on. Both functions have the same interface but
+#' different requirement for \code{read_fun} implementation.
+#'
+#' @section Custom reader function: Similarly to that of \link{create_gene_cna},
+#'   the reader function takes the filepath as the first argument. It will
+#'   return a data.table with at least two columns: \code{GENE} and
+#'   \code{Segment_Mean} of type \code{chracter} and \code{numeric}
+#'   respectively.
+#'
+#' @inheritParams create_gene_cna
+#'
+#' @seealso \code{\link[create_gene_cna]}
 #' @export
 #' @import data.table
 direct_gene_cna <- function(

@@ -23,6 +23,9 @@
 #'   Rest of the arguments \code{create_gene_exp(...)} will be passed to this
 #'   reader function.
 #'
+#'   Note: all string-like columns should \strong{NOT} be of type \code{factor}.
+#'   Remember to set \code{stringsAsFactors = FALSE}.
+#'
 #' @param sample_desc data.table object created by \link{create_sample_desc}.
 #' @param read_fun Custom reader function, see its own section for more detail.
 #' @param progress Whether to display a progress bar. By default \code{TRUE}.

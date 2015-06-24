@@ -29,6 +29,9 @@
 #'   Rest of the arguments \code{create_gene_cna(...)} will be passed to this
 #'   reader function.
 #'
+#'   Note: all string-like columns should \strong{NOT} be of type \code{factor}.
+#'   Remember to set \code{stringsAsFactors = FALSE}.
+#'
 #' @param sample_desc \link[data.table]{data.table} object created by
 #'   \link{create_sample_desc}.
 #' @param gain_threshold CNA expression above this will be considered as gain
@@ -50,7 +53,8 @@
 #'
 #' @seealso \code{\link[utils]{read.table}} and \code{\link[data.table]{fread}}
 #'   for custom reader function implementation; \code{\link{create_sample_desc}}
-#'   for creating sample description.
+#'   for creating sample description. If the gene information already exists in
+#'   the data, try \link{direct_gene_cna} to skip the genome reference lookup.
 #'
 #' @examples
 #' ## Use first three samples of the builtin dataset
