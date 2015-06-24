@@ -47,7 +47,7 @@ head(sample_desc_alt)
 
 ## Get oveall GE list using function `create_gene_exp`
 
-Third, we apply the `create_gene_exp` function to create an overall gene expression list of entire input samples. The output file will be saved as gene_exp.rda.
+Subsequently, we apply the `create_gene_exp` function to create an overall gene expression list of entire input samples. The output file will be saved as gene_exp.rda.
 
 ```{r}
 gene_exp <- create_gene_exp(sample_desc, progress = FALSE)
@@ -66,9 +66,9 @@ gene_exp <- create_gene_exp(
 )
 ```
 
-## Map CNA to human genes using function `create_gene_cna`
+## Map CNA to human genes using function `faster_gene_cna`
 
-Subsequently, we run `create_gene_cna` function to map CNA data to human genes using human genome version 19 as reference. For each mapped human genes, the input samples are divided into CNA-gain (G), CNA-loss (L), and neutral (N) groups based on its CNA statuses, whose default values are set as 2.5 for gain and 1.5 for loss. The output file will be saved as gene_cna.rda.
+Then, we run `faster_gene_cna` function to map CNA data to human genes using human genome version 19 as reference. For each mapped human genes, the input samples are divided into CNA-gain (G), CNA-loss (L), and neutral (N) groups based on its CNA statuses, whose default values are set as 2.5 for gain and 1.5 for loss. The output file will be saved as gene_cna.rda.
 
 
 ```{r}
@@ -100,7 +100,7 @@ my_cna_reader <- function(cna_filepath) {
 }
 
 gain_loss = log2(c(2.5, 1.5)) - 1
-gene_cna <- create_gene_cna(
+gene_cna <- faster_gene_cna(
   as.data.table(sample_desc),
   cna.gain.threshold = gain_loss[1], cna.loss.threshold = gain_loss[2],
   progress = TRUE, progress_width = 60,
@@ -111,7 +111,7 @@ gene_cna[GENE %in% c('TP53', 'BRCA1', 'NFKB1'), 1:10, with=FALSE]
 
 ```{r, eval=FALSE}
 doMC::registerDoMC(cores = 4)
-gene_cna <- create_gene_cna(
+gene_cna <- faster_gene_cna(
   sample_desc, gain_loss[[1]], gain_loss[[2]], parallel = TRUE
 )
 ```
@@ -119,8 +119,7 @@ gene_cna <- create_gene_cna(
 
 ## Identify CNA-driven differentially expressed genes using function `find_cna_driven_gene`
 
-Lastly, we employ `find_cna_driven_gene` function to identify differentially expressed genes driven by CNAs from samples with both proprocessed GE and CNA data that were obtained by previous two steps. Genes of CNAtoGeneList remains for further analyses if its ratio of the number of CN changed samples (G or L) to the number of total samples is larger than a given threshold. Then, statistical tests will be performed in the GE level by classifying the samples as G and L plus N groups or L and G plus N groups, depending on the CN of the interested gene increases or decreases.
-That is, only genes showing CNAs in at least 20% of the samples will be analyzed further, and the threshold can be changed by users. The GE levels are evaluated by the Student’s t-test and Wilcoxon rank sum test. False discovery rate, p-value, associated statistics are included in output files, and gene set enrichment analysis (GSEA) can be performed directly.
+Lastly, we employ `find_cna_driven_gene` function to identify differentially expressed genes driven by CNAs from samples with both proprocessed GE and CNA data that were obtained by previous two steps. Genes of gene_cna remain for further analyses if its ratio of the number of CN changed samples (G or L) to the number of total samples is larger than a given threshold. Then, statistical tests will be performed in the GE level by classifying the samples as G and L plus N groups or L and G plus N groups, depending on the CN of the interested gene increases or decreases. That is, only genes showing CNAs in at least 20% of the samples will be analyzed further, and the threshold can be changed by users. The GE levels are evaluated by the Student’s t-test and Wilcoxon rank sum test. False discovery rate, p-value, associated statistics are included in output files, and gene set enrichment analysis (GSEA) can be performed directly.
 
 ```{r}
 cna_driven_genes <- find_cna_driven_gene(
