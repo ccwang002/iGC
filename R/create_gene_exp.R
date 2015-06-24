@@ -36,26 +36,28 @@
 #'   the corresponding gene names.
 #'
 #' @seealso \code{\link[utils]{read.table}} and \code{\link[data.table]{fread}}
+#'   for custom reader function implementation; \code{\link{create_sample_desc}}
+#'   for creating sample description.
+#'
 #' @examples
-#' ## Use partial of built-in dataset as demo
+#' ## Use first three samples of the builtin dataset
 #'
 #' sample_root <- system.file("extdata", package = "iGC")
 #' sample_desc_pth <- file.path(sample_root, "sample_desc.csv")
-#'
-#' ## read only the first three samples
 #' sample_desc <- create_sample_desc(
 #'   sample_desc_pth, sample_root=sample_root
 #' )[1:3]
 #'
-#' ## default custom reader function for TCGA level 3 data
+#' ## Define custom reader function for TCGA level 3 data
 #' my_gene_exp_reader <- function(ge_filepath) {
-#'    gene_exp <- read.table(
-#'      ge_filepath,
-#'      header = FALSE, skip = 2,
-#'      na.strings = "null",
-#'      colClasses = c("character", "double")
-#'    )
-#'    data.table::as.data.table(gene_exp)
+#'   gene_exp <- read.table(
+#'     ge_filepath,
+#'     header = FALSE, skip = 2,
+#'     na.strings = "null",
+#'     colClasses = c("character", "double")
+#'   )
+#'   dt <- data.table::as.data.table(gene_exp)
+#'   data.table::setnames(dt, c("GENE", "Expression"))
 #' }
 #' gene_exp <- create_gene_exp(
 #'   sample_desc,

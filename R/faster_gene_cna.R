@@ -23,8 +23,8 @@
 #' @section Custom reader function: Custom reader function is given by
 #'   \code{read_fun = your_reader_fun}. It takes the filepath as the first
 #'   argument and return a data.table with at least the following four columns:
-#'   \code{Chromosome}, \code{Start}, \code{End}, and \code{expression} of type
-#'   character, integer, integer and double respectively.
+#'   \code{Chromosome}, \code{Start}, \code{End}, and \code{Segment_Mean} of
+#'   type character, integer, integer and double respectively.
 #'
 #'   Rest of the arguments \code{create_gene_cna(...)} will be passed to this
 #'   reader function.
@@ -49,6 +49,37 @@
 #'   column \code{GENE} contains the corresponding gene names.
 #'
 #' @seealso \code{\link[utils]{read.table}} and \code{\link[data.table]{fread}}
+#'   for custom reader function implementation; \code{\link{create_sample_desc}}
+#'   for creating sample description.
+#'
+#' @examples
+#' ## Use first three samples of the builtin dataset
+#'
+#' sample_root <- system.file("extdata", package = "iGC")
+#' sample_desc_pth <- file.path(sample_root, "sample_desc.csv")
+#' sample_desc <- create_sample_desc(
+#'   sample_desc_pth, sample_root=sample_root
+#' )[1:3]
+#'
+#' ## Define custom reader function for TCGA level 3 gene exp. data
+#' my_cna_reader <- function(cna_filepath) {
+#'   cna <- data.table::fread(cna_filepath, sep = '\t', header = TRUE)
+#'   data.table::setnames(
+#'     cna,
+#'     c("Sample", "Chromosome", "Start", "End", "Num_Probes", "Segment_Mean")
+#'   )
+#'   # pick only the needed columns
+#'   cna[, .(Chromosome, Start, End, Segment_Mean)]
+#' }
+#'
+#' ## Read all samples' CNA data and combined as a single table
+#' gene_cna <- create_gene_cna(
+#'   sample_desc,
+#'   gain_threshold = log2(2.3) - 1, loss_threshold = log2(1.7) - 1,
+#'   read_fun = my_cna_reader,
+#' )
+#' gene_cna[GENE %in% c("BRCA2", "TP53", "SEMA5A"), ]
+#'
 #' @import data.table
 #' @export
 create_gene_cna <- function(
@@ -167,6 +198,3 @@ read_cna_tcga <- function(cna_filepath) {
   cna <- fread(cna_filepath, sep = '\t', header = TRUE)
   cna
 }
-
-
-
