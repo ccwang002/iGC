@@ -23,6 +23,9 @@
 #'   Rest of the arguments \code{create_gene_exp(...)} will be passed to this
 #'   reader function.
 #'
+#'   Note: all string-like columns should \strong{NOT} be of type \code{factor}.
+#'   Remember to set \code{stringsAsFactors = FALSE}.
+#'
 #' @param sample_desc data.table object created by \link{create_sample_desc}.
 #' @param read_fun Custom reader function, see its own section for more detail.
 #' @param progress Whether to display a progress bar. By default \code{TRUE}.
@@ -36,26 +39,28 @@
 #'   the corresponding gene names.
 #'
 #' @seealso \code{\link[utils]{read.table}} and \code{\link[data.table]{fread}}
+#'   for custom reader function implementation; \code{\link{create_sample_desc}}
+#'   for creating sample description.
+#'
 #' @examples
-#' ## Use partial of built-in dataset as demo
+#' ## Use first three samples of the builtin dataset
 #'
 #' sample_root <- system.file("extdata", package = "iGC")
 #' sample_desc_pth <- file.path(sample_root, "sample_desc.csv")
-#'
-#' ## read only the first three samples
 #' sample_desc <- create_sample_desc(
 #'   sample_desc_pth, sample_root=sample_root
 #' )[1:3]
 #'
-#' ## default custom reader function for TCGA level 3 data
+#' ## Define custom reader function for TCGA level 3 data
 #' my_gene_exp_reader <- function(ge_filepath) {
-#'    gene_exp <- read.table(
-#'      ge_filepath,
-#'      header = FALSE, skip = 2,
-#'      na.strings = "null",
-#'      colClasses = c("character", "double")
-#'    )
-#'    data.table::as.data.table(gene_exp)
+#'   gene_exp <- read.table(
+#'     ge_filepath,
+#'     header = FALSE, skip = 2,
+#'     na.strings = "null",
+#'     colClasses = c("character", "double")
+#'   )
+#'   dt <- data.table::as.data.table(gene_exp)
+#'   data.table::setnames(dt, c("GENE", "Expression"))
 #' }
 #' gene_exp <- create_gene_exp(
 #'   sample_desc,
@@ -67,48 +72,51 @@
 #' @import data.table
 #' @import plyr
 #' @export
-create_gene_exp <- function(sample_desc, read_fun = NULL, progress = TRUE, progress_width = 48, ...) {
-  if (is.null(read_fun)) {
-    read_fun <- read_gene_exp
-  }
-  ge_filepaths <- sample_desc$GE_filepath
+create_gene_exp <- function(
+    sample_desc, read_fun = NULL,
+    progress = TRUE, progress_width = 48, ...
+) {
+    if (is.null(read_fun)) {
+        read_fun <- read_gene_exp
+    }
+    ge_filepaths <- sample_desc$GE_filepath
 
-  # make the progress bar width smaller
-  if (progress) {
-    progress_opt <- "time"
-    old_width_option <- options(width = progress_width)
-  } else {
-    progress_opt <- "none"
-  }
-  raw_dfs <- alply(ge_filepaths, 1, read_fun, ..., .expand = FALSE, .progress = progress_opt)
-  # restore old width option
-  if (progress) options(old_width_option)
+    # make the progress bar width smaller
+    if (progress) {
+        progress_opt <- "time"
+        old_width_option <- options(width = progress_width)
+    } else {
+        progress_opt <- "none"
+    }
+    raw_dfs <- alply(
+        ge_filepaths, 1, read_fun, ...,
+        .expand = FALSE, .progress = progress_opt
+    )
+    # restore old width option
+    if (progress) options(old_width_option)
 
-  df <- as.data.table(llply(raw_dfs, function(df){df[[2]]}))
-  setnames(df, seq_len(ncol(df)), sample_desc$Sample)
-  df$GENE <- raw_dfs[[1]][[1]]  # gene names from the parsed output of the first sample
-  setcolorder(df, c("GENE", sample_desc$Sample))
-  df
+    df <- as.data.table(llply(raw_dfs, function(df){df[[2]]}))
+    setnames(df, seq_len(ncol(df)), sample_desc$Sample)
+    # gene names from the parsed output of the first sample
+    df$GENE <- raw_dfs[[1]][[1]]
+    setcolorder(df, c("GENE", sample_desc$Sample))
+    df
 }
 
 read_gene_exp <- function(ge_filepath, ...) {
-  gene_exp <- read.table(
-    ge_filepath,
-    header = FALSE,
-    skip = 2,
-    na.strings = "null",
-    colClasses = c("character", "double"),
-    ...
-  )
-  # We have to read in as character and parse it as double. See bug report of
-  # data.table on https://github.com/Rdatatable/data.table/issues/504
-  # gene_exp <- fread(
-  #   ge_filepath, header = FALSE, skip = 2,
-  #   colClasses = c("character", "double"), na.strings=c("null")
-  # )
-  as.data.table(gene_exp)
+    gene_exp <- read.table(
+        ge_filepath,
+        header = FALSE,
+        skip = 2,
+        na.strings = "null",
+        colClasses = c("character", "double"),
+        ...
+    )
+    # We have to read in as character and parse it as double. See bug report of
+    # data.table on https://github.com/Rdatatable/data.table/issues/504
+    # gene_exp <- fread(
+    #   ge_filepath, header = FALSE, skip = 2,
+    #   colClasses = c("character", "double"), na.strings=c("null")
+    # )
+    as.data.table(gene_exp)
 }
-
-
-
-
