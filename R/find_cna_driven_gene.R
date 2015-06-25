@@ -7,10 +7,10 @@
 #' genes.
 #'
 #' The gene is considered CNA-gain if the proportion of the sample exhibiting
-#' gain exceeds the threshold \code{gain_ratio}, that is, number of samples
+#' gain exceeds the threshold \code{gain_prop}, that is, number of samples
 #' having \code{gain_loss} = 1. Reversely, the gene is considered CNA-loss if
 #' \%samples that \code{gain_loss} = -1 is beyond a given threshold
-#' \code{loss_ratio}.
+#' \code{loss_prop}.
 #'
 #' When performing the t-test, sample grouping depends on the analysis scenario
 #' being either CNA-gain or CNA-loss driven. In CNA-gain driven scenario, two
@@ -22,9 +22,9 @@
 #'
 #' @param gene_cna Joint CNA table from \link{create_gene_cna}.
 #' @param gene_exp Joint gene expression table from \link{create_gene_exp}.
-#' @param gain_ratio Minimum proportion of the gain samples to be consider
+#' @param gain_prop Minimum proportion of the gain samples to be consider
 #'   CNA-gain. Default is 0.2.
-#' @param loss_ratio Minimum proportion of the loss samples to be consider
+#' @param loss_prop Minimum proportion of the loss samples to be consider
 #'   CNA-loss. Default is 0.2.
 #'
 #' @param progress Whether to display a progress bar. By default \code{TRUE}.
@@ -78,7 +78,7 @@
 #' @export
 find_cna_driven_gene <- function(
     gene_cna, gene_exp,
-    gain_ratio = 0.2, loss_ratio = 0.2,
+    gain_prop = 0.2, loss_prop = 0.2,
     progress = TRUE, progress_width = 32,
     parallel = FALSE
 ) {
@@ -95,15 +95,15 @@ find_cna_driven_gene <- function(
     # setattr prevent from creating unneccessary object copies.
     setattr(gene_cna_t, 'dimnames', list(NULL, shared_genes))
 
-    if (progress) message("Computing gain/loss sample ratio ...\n")
+    if (progress) message("Computing gain/loss sample proportion ...\n")
     num_sample <- length(all_samples)
-    gol_ratio_table <- data.table(
+    gol_prop_table <- data.table(
         Gain = colSums(gene_cna_t == 1, na.rm = TRUE) / num_sample,
         Loss = colSums(gene_cna_t == -1, na.rm = TRUE) / num_sample,
         Normal = colSums(gene_cna_t == 0, na.rm = TRUE) / num_sample
     )
-    gol_ratio_table[, GENE:=shared_genes]
-    setkeyv(gol_ratio_table, c("GENE"))
+    gol_prop_table[, GENE:=shared_genes]
+    setkeyv(gol_prop_table, c("GENE"))
 
     setkeyv(gene_exp, c("GENE"))
     gene_exp_t <- t(gene_exp[shared_genes, all_samples, with=FALSE])
@@ -118,9 +118,9 @@ find_cna_driven_gene <- function(
         }
 
         if (cna_type == 'gain') {
-            cna_driven_genes <- gol_ratio_table[Gain > gain_ratio, .(GENE)][[1]]
+            cna_driven_genes <- gol_prop_table[Gain > gain_prop, .(GENE)][[1]]
         } else if (cna_type == 'loss') {
-            cna_driven_genes <- gol_ratio_table[Loss > loss_ratio, .(GENE)][[1]]
+            cna_driven_genes <- gol_prop_table[Loss > loss_prop, .(GENE)][[1]]
         } else {
             stop("Unknown cna_type, should be either 'gain' or 'loss'")
         }
@@ -168,7 +168,7 @@ find_cna_driven_gene <- function(
                 ret_val <- data.table(
                     GENE = gene,
                     p_value = p_value,
-                    gol_ratio_table[gene, !"GENE", with=FALSE],
+                    gol_prop_table[gene, !"GENE", with=FALSE],
                     gain_exp_mean = mean(g_gain_exp),
                     normal_exp_mean = mean(g_normal_exp),
                     loss_exp_mean = mean(g_loss_exp),
@@ -191,7 +191,7 @@ find_cna_driven_gene <- function(
         setnames(
             cna_driven_dt,
             c("Gain", "Normal", "Loss"),
-            c("gain_sample_ratio", "normal_sample_ratio", "loss_sample_ratio")
+            c("gain_sample_prop", "normal_sample_prop", "loss_sample_prop")
         )
         return(cna_driven_dt)
     }
