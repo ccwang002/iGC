@@ -15,8 +15,8 @@
 #' When performing the t-test, sample grouping depends on the analysis scenario
 #' being either CNA-gain or CNA-loss driven. In CNA-gain driven scenario, two
 #' groups, CNA-gain and other samples, are made. In CNA-loss driven scenario,
-#' group CNA-loss and the others are made. Genes appear in both scenario will
-#' be collected into a third table and excluded from their original tables.
+#' group CNA-loss and the others are made. Genes appear in both scenario will be
+#' collected into a third table and excluded from their original tables.
 #'
 #' See the vignette for usage of this function by a thorough example.
 #'
@@ -33,7 +33,44 @@
 #' @param parallel Enable parallelism by plyr. One has to specify a parallel
 #'   engine beforehand. See example for more information.
 #'
-#' @return List of three data.table for CNA-driven scenarios: gain, loss, and both.
+#' @return List of three data.table objest for CNA-driven scenarios: gain, loss,
+#'   and both, which can be accessed by names: `gain_driven`, `loss_driven` and
+#'   `both`.
+#'
+#' @examples
+#' require(data.table)
+#'
+#' ## Create gene_exp and gene_cna manually.
+#' gene_exp <- data.table(
+#'     GENE = c("BRCA2", "TP53", "GNPAT"),
+#'     A = c(-0.95, 0.89, 0.21),
+#'     B = c(1.72, -0.05, NA),
+#'     C = c(-1.18, 1.15, 2.47),
+#'     D = c(-1.24, -0.07, 1.2),
+#'     E = c(1.01, 0.93, 1.54)
+#' )
+#' gene_cna <- data.table(
+#'     GENE = c("BRCA2", "TP53", "GNPAT"),
+#'     A = c(1, 1, NA),
+#'     B = c(-1, -1, 1),
+#'     C = c(1, -1, 1),
+#'     D = c(1, -1, -1),
+#'     E = c(0, 0, -1)
+#' )
+#'
+#' ## Find CNA-driven genes
+#' cna_driven_genes <- find_cna_driven_gene(
+#'     gene_cna, gene_exp, progress=FALSE
+#' )
+#' # Gain driven genes
+#' cna_driven_genes$gain_driven
+#'
+#' # Loss driven genes
+#' cna_driven_genes$loss_driven
+#'
+#' # Gene shown in both gain and loss records
+#' cna_driven_genes$both
+#'
 #'
 #' @import data.table
 #' @import plyr
