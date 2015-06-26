@@ -1,27 +1,39 @@
 ---
-title: "Overview of iGC"
+title: "Introduction to iGC"
 author: "iGC Developers"
 date: "`r Sys.Date()`"
 output:
   BiocStyle::html_document:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{Overview of iGC}
+  %\VignetteIndexEntry{Introduction to iGC}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-```{r, fig.show='hold'}
-library(iGC)
-```
-This document presents an overview of the `iGC` package. To perform an integrated analysis of gene expression (GE) and copy number alteration (CNA) (iGC) concurrently, the `iGC` package is developed to identify differentially expressed genes driven by CNAs from samples with both GE and CNA data. That is, for each gene, the samples are classified into different groups based on their CNA statues and statistical tests are performed in the GE level accordingly. The `iGC` package provides three main important functions: 
-
-- `create_gene_exp`
-  : rearranges the input gene expression files to a gene expression list of entire samples
-- `faster_gene_cna`
-  : maps CNA data to human genes and then defines the mapped human genes as CN gain or loss based on the CN threshold
-- `find_cna_drive_gene`
-  : identifies CNA-driven differentially expressed genes
+This document guides one through all available functions of the `iGC` package. Package iGC aims to analyze gene expression (GE) and copy number alteration (CNA) (iGC) concurrently.
 
 
+Traditional CNA analysis method is to investigate different types of samples and integrate their results by Venn diagrams. Challenges arise, however, when the low reproducibility and inconsistency are observed across multiple platforms. To address these issues, iGC tests gene expression profiles and copy number variation simultaneously.
+
+For more information about the method iGC uses, please refer to our publication: Yi-Pin Lai, Liang-Bo Wang, Liang-Chuan Lai, Mong-Hsun Tsai, Tzu-Pin Lu, Eric Y Chuang. iGC--an integrated analysis package of Gene expression and Copy number alteration, *Bioinfomatics* (publication pending).
+
+## General Workflow
+
+The general workflow can be summarized as follows,
 
 ![](pics/analysis_workflow.png)
+
+
+Basically there are four steps, corresponding to four R functions, to complete the analysis:
+
+1. Specify sample and their data relations
+2. Read and organize gene expression files
+3. Read and organize CNA files based on gene regions
+4. Identify CNA-driven differentially expressed genes
+
+
+## Q and As
+
+#### Q: Why required to use the bundled hg19 human genome reference?
+
+In the early phase of development, iGC requires a special data structure for genome reference hence one is bundled. Now no such special structure is required, so we plan to relax such constraint in the coming-up release and user will be able to pass in other references available on Bioconductor.
