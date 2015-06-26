@@ -60,9 +60,9 @@ find_cna_driven_gene <- function(
     if (progress) message("Computing gain/loss sample ratio ...\n")
     num_sample <- length(all_samples)
     gol_ratio_table <- data.table(
-        Gain = colSums(gene_cna_t == 1) / num_sample,
-        Loss = colSums(gene_cna_t == -1) / num_sample,
-        Normal = colSums(gene_cna_t == 0) / num_sample
+        Gain = colSums(gene_cna_t == 1, na.rm = TRUE) / num_sample,
+        Loss = colSums(gene_cna_t == -1, na.rm = TRUE) / num_sample,
+        Normal = colSums(gene_cna_t == 0, na.rm = TRUE) / num_sample
     )
     gol_ratio_table[, GENE:=shared_genes]
     setkeyv(gol_ratio_table, c("GENE"))
@@ -113,20 +113,18 @@ find_cna_driven_gene <- function(
                     if (length(g_gain_exp) <= 1 ||
                         length(c(g_normal_exp, g_loss_exp)) <= 1) {
                         p_value <- NA
-                        vs_rest_exp_diff <- NA
                     } else {
                         p_value <- t.test(g_gain_exp, c(g_normal_exp, g_loss_exp))$p.value
-                        vs_rest_exp_diff <- mean(g_gain_exp) - mean(c(g_normal_exp, g_loss_exp))
                     }
+                    vs_rest_exp_diff <- mean(g_gain_exp) - mean(c(g_normal_exp, g_loss_exp))
                 } else {
                     if (length(g_loss_exp) <= 1 ||
                         length(c(g_normal_exp, g_gain_exp)) <= 1) {
                         p_value <- NA
-                        vs_rest_exp_diff <- NA
                     } else {
                         p_value <- t.test(g_loss_exp, c(g_normal_exp, g_gain_exp))$p.value
-                        vs_rest_exp_diff <- mean(g_loss_exp) - mean(c(g_normal_exp, g_gain_exp))
                     }
+                    vs_rest_exp_diff <- mean(g_loss_exp) - mean(c(g_normal_exp, g_gain_exp))
                 }
 
                 ret_val <- data.table(
