@@ -18,6 +18,41 @@
 #'   column \code{GENE} contains the corresponding gene names.
 #'
 #' @seealso \code{\link{create_gene_cna}}
+#' @examples
+#'
+#' require(data.table)
+#'
+#' ## Create a CNA dataset that has been already mapped onto gene regions
+#'
+#' cna_geo_list = list(
+#'     sample_A = data.table(
+#'         GENE = c("TP53", "BRCA2"),
+#'         Segment_Mean = c(1.05, -2.03)
+#'     ),
+#'     sample_B = data.table(
+#'         GENE = c("TP53", "BRCA2", "NDPH1"),
+#'         Segment_Mean = c(0.38, -1.71, 2.6)
+#'     )
+#' )
+#' sample_desc <- data.table(
+#'     Sample = paste("sample", c("A", "B"), sep = "_")
+#' )
+#' sample_desc$CNA_filepath <- sample_desc$Sample
+#'
+#'
+#' ## Example code for reading
+#'
+#' read_cna_geo <- function(pth) {
+#'     # For demonstration, file reading silently redirects
+#'     # to list lookup
+#'     cna_geo_list[[pth]]
+#' }
+#' gene_cna <- direct_gene_cna(
+#'     sample_desc,
+#'     read_fun = read_cna_geo, progress=FALSE
+#' )
+#' gene_cna
+#'
 #' @export
 #' @import data.table
 direct_gene_cna <- function(

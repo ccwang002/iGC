@@ -41,6 +41,7 @@
 #' require(data.table)
 #'
 #' ## Create gene_exp and gene_cna manually.
+#'
 #' gene_exp <- data.table(
 #'     GENE = c("BRCA2", "TP53", "GNPAT"),
 #'     A = c(-0.95, 0.89, 0.21),
