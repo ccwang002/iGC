@@ -79,21 +79,12 @@ my_cna_reader <- function(cna_filepath) {
   cna[, .(Chromosome, Start, End, Segment_Mean)]
 }
 
-<<<<<<< HEAD
-gain_loss = log2(c(2.5, 1.5)) - 1
-gene_cna <- faster_gene_cna(
-  as.data.table(sample_desc),
-  cna.gain.threshold = gain_loss[1], cna.loss.threshold = gain_loss[2],
-  progress = TRUE, progress_width = 60,
-  read_fun = my_cna_reader
-=======
 gain_loss = log2(c(2.4, 1.6)) - 1
 gene_cna <- create_gene_cna(
   sample_desc,
   gain_threshold = gain_loss[1], loss_threshold = gain_loss[2],
   read_fun = my_cna_reader,
   progress = FALSE
->>>>>>> bb0b69bc216f60ef9bb81b67b05100452d087645
 )
 gene_cna[GENE %in% c('TP53', 'BRCA1', 'NFKB1'), 1:10, with=FALSE]
 ```
