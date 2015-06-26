@@ -1,0 +1,187 @@
+---
+title: "Introduction to iGC"
+author: "iGC Developers"
+date: "`r Sys.Date()`"
+output:
+  BiocStyle::html_document:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Introduction to iGC}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+This document guides one through all available functions of the `iGC` package. Package iGC aims to analyze gene expression (GE) and copy number alteration (CNA) (iGC) concurrently.
+
+
+Traditional CNA analysis method is to investigate different types of samples and integrate their results by Venn diagrams. Challenges arise, however, when the low reproducibility and inconsistency are observed across multiple platforms. To address these issues, iGC tests gene expression profiles and copy number variation simultaneously.
+
+For more information about the method iGC uses, please refer to our publication: Yi-Pin Lai, Liang-Bo Wang, Liang-Chuan Lai, Mong-Hsun Tsai, Tzu-Pin Lu, Eric Y Chuang. iGC--an integrated analysis package of Gene expression and Copy number alteration, *Bioinfomatics* (publication pending).
+
+
+## Installation
+
+iGC is on Bioconductor and can be installed following standard installation procedure.
+
+```{r, eval=FALSE}
+source("http://www.bioconductor.org/biocLite.R")
+biocLite("iGC")
+```
+
+To use,
+
+```{r}
+library(iGC)
+```
+
+
+## General Workflow
+
+The general workflow can be summarized as follows,
+
+![](pics/analysis_workflow.png)
+
+Basically there are four steps, corresponding to four R functions, to complete the analysis:
+
+1. Specify sample and their data relations
+2. Read and organize gene expression files
+3. Read and organize CNA files based on gene regions
+4. Identify CNA-driven differentially expressed genes
+
+
+## Usage Example
+
+Here we show an example whose data are included inside iGC.
+
+### Data Source
+
+To demonstrate the usage of the `iGC` package, the package comes with 50 breast cancer samples, which are selected from a microarray dataset of total 523 breast cancer samples from TCGA level 3.
+
+For each sample, it contains a paired gene expression (GE) and the copy number (CN) data. The GE data was conducted by Agilent G4502A platform and the CN data was generated from Genome Wide SNP platform.
+
+
+### Sample Description Generation
+
+First, a sample description table is created to connect sample names with their data. It can be stored as a CSV file with three columns: Sample, CNA\_filepath, and GE\_filepath.
+
+```{r}
+sample_desc_pth <- system.file("extdata", "sample_desc.csv", package = "iGC")
+sample_desc <- create_sample_desc(sample_desc_pth)
+```
+
+Alternatively, one can pass three separate character vectors to create the same table,
+
+```{r, eval=FALSE}
+sample_desc <- create_sample_desc(
+  sample_names = sample_desc$Sample,
+  cna_filepaths = sample_desc$CNA_filepath,
+  ge_filepaths = sample_desc$GE_filepath
+)
+```
+
+```{r}
+head(sample_desc)
+```
+
+
+### Joint Gene Expression Table
+
+Second, we join all gene expression input samples as one table.
+
+```{r}
+gene_exp <- create_gene_exp(sample_desc, progress = FALSE)
+```
+
+`create_gene_exp` comes with a builtin reader function to read in the gene expression data. However for formats that it fails to recognize, one can define one's own reader function through `read_fun`,
+
+```{r, eval=FALSE}
+gene_exp <- create_gene_exp(
+  sample_desc,
+  read_fun = read.table,
+  progress = TRUE, progress_width = 60,
+  header = FALSE,
+  skip = 2,
+  na.strings = "null",
+  colClasses = c("character", "double")
+)
+```
+
+Note that arguments `header`, `skip`, `na.srings`, and `colClasses` are not used by `create_gene_exp` but passed to `read.table`, the custom reader function defined here, directly.
+
+
+We select the expression of gene TP53, BRCA1, and NFKB1 for the first 9 samples (first column contains gene names).
+
+```{r}
+gene_exp[GENE %in% c('TP53', 'BRCA1', 'NFKB1'), 1:10, with=FALSE]
+```
+
+
+### Joint CNA Status Table Mapped onto Gene Locations
+
+Thirdly, the CNA data is read, collected, and mapped on to human gene locations using genome reference hg19. Each gene will be evaluated as CNA-gain (1), CNA-loss (-1), and neutral (0). Threshold can be set to tune the level of CNA determined as gain or loss.
+
+Here we set the threshold of 2.4 for gain and 1.6 for loss events.
+
+```{r}
+my_cna_reader <- function(cna_filepath) {
+  cna <- data.table::fread(cna_filepath, sep = '\t', header = TRUE)
+  cna[, .(Chromosome, Start, End, Segment_Mean)]
+}
+
+gain_loss = log2(c(2.4, 1.6)) - 1
+gene_cna <- create_gene_cna(
+  sample_desc,
+  gain_threshold = gain_loss[1], loss_threshold = gain_loss[2],
+  read_fun = my_cna_reader,
+  progress = FALSE
+)
+gene_cna[GENE %in% c('TP53', 'BRCA1', 'NFKB1'), 1:10, with=FALSE]
+```
+
+#### Parallelization
+
+For performance issues, one can enable parallelization to boost the process.
+
+```{r, eval=FALSE}
+# Change 4 to match one's total CPU cores
+doMC::registerDoMC(cores = 4)
+gene_cna <- faster_gene_cna(
+  sample_desc, gain_loss[[1]], gain_loss[[2]], parallel = TRUE
+)
+```
+
+#### Read gene information directly from data
+
+If one's CNA data already contains gene information, try `direct_gene_cna`.
+
+
+## CNA-driven Differentially Expressed Genes Identification
+
+Lastly, run `find_cna_driven_gene` to identify differentially expressed genes driven by CNAs from samples with both proprocessed GE `gene_exp` and CNA data `gene_cna` that were obtained from the previous steps.
+
+A threshold for proportion of the copy number changed samples (gain or loss) is given to select CNA-driven genes.
+
+```{r}
+cna_driven_genes <- find_cna_driven_gene(
+  gene_cna, gene_exp,
+  gain_prop = 0.15, loss_prop = 0.15,
+  progress = FALSE, parallel = FALSE
+)
+head(cna_driven_genes$gain_driven)
+head(cna_driven_genes$loss_driven)
+head(cna_driven_genes$both)
+```
+
+For example, BRCA1 appears to be CNA loss-driven in this dataset, and its expression is lower in samples of CNA loss than samples of CNA neutral.
+
+```{r}
+cna_driven_genes$loss_driven[GENE %in% c('BRCA1')]
+```
+
+
+## Q and As
+
+#### Q: Why required to use the bundled hg19 human genome reference?
+
+In the early phase of development, iGC required a special data structure for genome reference hence one is bundled. Now no such special structure is required, so we plan to relax such constraint in the coming-up release and user will be able to pass in other references available on Bioconductor.
+
+Currently the modified `hg19DBNM` contains RefSeq transcripts of hg19 from UCSC Genome Browser. The transcripts with NM marker ID and protein coding, were selected.
