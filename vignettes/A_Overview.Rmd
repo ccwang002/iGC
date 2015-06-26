@@ -23,4 +23,5 @@ This document presents an overview of the `iGC` package. To perform an integrate
   : identifies CNA-driven differentially expressed genes
 
 
-![](analysis_workflow.png)
+
+![](pics/analysis_workflow.png)
