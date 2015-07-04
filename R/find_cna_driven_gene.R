@@ -1,8 +1,8 @@
 #' Perform an integrated analysis of gene expression (GE) and copy number
 #' alteration (CNA)
 #'
-#' The function finds CNA-driven differentially expressed gene with p-value,
-#' false discovery rate, and associated statistics. The result will includes
+#' The function finds CNA-driven differentially expressed gene and returns the corresponding p-value,
+#' false discovery rate, and associated statistics. The result includes
 #' three tables which collects information for gain-, loss-, and both-driven
 #' genes.
 #'
@@ -14,7 +14,7 @@
 #'
 #' When performing the t-test, sample grouping depends on the analysis scenario
 #' being either CNA-gain or CNA-loss driven. In CNA-gain driven scenario, two
-#' groups, CNA-gain and other samples, are made. In CNA-loss driven scenario,
+#' groups, CNA-gain and the other samples, are made. In CNA-loss driven scenario,
 #' group CNA-loss and the others are made. Genes appear in both scenario will be
 #' collected into a third table and excluded from their original tables.
 #'
@@ -55,10 +55,13 @@
 #'     E = c(0, 0, -1)
 #' )
 #'
+#'
 #' ## Find CNA-driven genes
+#'
 #' cna_driven_genes <- find_cna_driven_gene(
 #'     gene_cna, gene_exp, progress=FALSE
 #' )
+#'
 #' # Gain driven genes
 #' cna_driven_genes$gain_driven
 #'

@@ -2,13 +2,14 @@
 #'
 #' This function aims to complement \code{\link{create_gene_cna}}. Instead of
 #' mapping CNA records onto genes by genome reference, it reads the existed
-#' column that shows which gene each CNA lies on. Both functions have the same
-#' interface but different requirement for \code{read_fun} implementation.
+#' column containing the gene each CNA lies on. Two functions share the same
+#' interface but they have different requirement for the \code{read_fun}
+#' implementation.
 #'
-#' @section Custom reader function: Similarly to that of \link{create_gene_cna},
+#' @section Custom reader function: Similar to that of \link{create_gene_cna},
 #'   the reader function takes the filepath as the first argument. It will
 #'   return a data.table with at least two columns: \code{GENE} and
-#'   \code{Segment_Mean} of type \code{chracter} and \code{numeric}
+#'   \code{Segment_Mean} of type \code{character} and \code{numeric}
 #'   respectively.
 #'
 #' @inheritParams create_gene_cna

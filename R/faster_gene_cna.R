@@ -1,19 +1,19 @@
 #' Load and map CNA gain/loss onto human gene location by genome reference
 #'
-#' The function reads in all sample CNA data given by sample description
+#' The function reads in all sample CNA data given by the sample description
 #' \code{sample_desc} and return a joint CNA gain/loss table based on gene
 #' regions across samples.
 #'
 #' A gene is considered to have CNA gain if the overlapped CNA record expression
 #' is higher than the given threshold. Similarly, a gene is considered CNA loss
 #' if the overlapped CNA record is lower than the given threshold. If multiple
-#' CNA records map onto the same gene region with both gain and loss, majority
-#' wins. If none of the records map to the gene, NA is given.
+#' CNA records map onto the same gene region with both gain and loss, the
+#' majority wins. If none of the records map to the gene, NA is given.
 #'
 #' By default it assumes the data to be of TCGA level 3 file format. For other
-#' data (e.g. raw data or other experiments from GEO), one should implement a
-#' custom reader function that accepts the filepath as the first argument. See
-#' section \emph{Custom reader function} for full specification.
+#' data format (e.g. raw data or other experiments from GEO), one should
+#' implement a custom reader function that accepts the filepath as the first
+#' argument. See section \emph{Custom reader function} for full specification.
 #'
 #' Currently the package ships a custom genome reference hg19, \link{hg19DBNM},
 #' for gene region look up. Each gene's region is defined by the widest splicing
@@ -21,13 +21,14 @@
 #' regions. This limitation may change in the future.
 #'
 #' @section Custom reader function: Custom reader function is given by
-#'   \code{read_fun = your_reader_fun}. It takes the filepath as the first
-#'   argument and return a data.table with at least the following four columns:
-#'   \code{Chromosome}, \code{Start}, \code{End}, and \code{Segment_Mean} of
-#'   type character, integer, integer and double respectively.
+#'   \code{read_fun = your_reader_fun}. It takes the filepath to CNA data as the
+#'   first argument and return a data.table with at least the following four
+#'   columns: \code{Chromosome}, \code{Start}, \code{End}, and
+#'   \code{Segment_Mean} of type character, integer, integer and numeric
+#'   respectively.
 #'
-#'   Rest of the arguments \code{create_gene_cna(...)} will be passed to this
-#'   reader function.
+#'   Rest arguments of \code{create_gene_cna(...)} will be passed to this reader
+#'   function.
 #'
 #'   Note: all string-like columns should \strong{NOT} be of type \code{factor}.
 #'   Remember to set \code{stringsAsFactors = FALSE}.
@@ -62,36 +63,42 @@
 #' sample_root <- system.file("extdata", package = "iGC")
 #' sample_desc_pth <- file.path(sample_root, "sample_desc.csv")
 #' sample_desc <- create_sample_desc(
-#'   sample_desc_pth, sample_root=sample_root
+#'     sample_desc_pth, sample_root=sample_root
 #' )[1:3]
 #'
+#'
 #' ## Define custom reader function for TCGA level 3 gene exp. data
+#'
 #' my_cna_reader <- function(cna_filepath) {
-#'   cna <- data.table::fread(cna_filepath, sep = '\t', header = TRUE)
-#'   data.table::setnames(
-#'     cna,
-#'     c("Sample", "Chromosome", "Start", "End", "Num_Probes", "Segment_Mean")
-#'   )
-#'   # pick only the needed columns
-#'   cna[, .(Chromosome, Start, End, Segment_Mean)]
+#'     cna <- data.table::fread(cna_filepath, sep = '\t', header = TRUE)
+#'     data.table::setnames(
+#'         cna,
+#'         c("Sample", "Chromosome", "Start", "End", "Num_Probes", "Segment_Mean")
+#'     )
+#'     # pick only the needed columns
+#'     cna[, .(Chromosome, Start, End, Segment_Mean)]
 #' }
 #'
+#'
 #' ## Read all samples' CNA data and combined as a single table
+#'
 #' gene_cna <- create_gene_cna(
-#'   sample_desc,
-#'   gain_threshold = log2(2.3) - 1, loss_threshold = log2(1.7) - 1,
-#'   read_fun = my_cna_reader,
+#'     sample_desc,
+#'     gain_threshold = log2(2.3) - 1, loss_threshold = log2(1.7) - 1,
+#'     read_fun = my_cna_reader,
 #' )
 #' gene_cna[GENE %in% c("BRCA2", "TP53", "SEMA5A"), ]
 #'
+#'
 #' \dontrun{
 #' ## To boost the speed, utilize parallelization
+#'
 #' doMC::registerDoMC(4)  # number of CPU cores
 #' gene_cna <- create_gene_cna(
-#'   sample_desc,
-#'   gain_threshold = log2(2.3) - 1, loss_threshold = log2(1.7) - 1,
-#'   read_fun = my_cna_reader,
-#'   parallel = TRUE
+#'     sample_desc,
+#'     gain_threshold = log2(2.3) - 1, loss_threshold = log2(1.7) - 1,
+#'     read_fun = my_cna_reader,
+#'     parallel = TRUE
 #' )
 #' }
 #' @import data.table

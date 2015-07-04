@@ -1,27 +1,28 @@
 #' Create an joint gene expression table of all samples
 #'
-#' The function reads in all sample gene expression data given by sample
+#' The function reads in all gene expression data given by the sample
 #' description \code{sample_desc} and return a joint expression table of all
-#' given genes across samples.
+#' samples.
 #'
 #' By default it assumes the data to be of TCGA level 3 file format. However,
-#' nearly all real world data fail to share the same format. In this case, one
-#' should implement a custom reader function that accepts the filepath as the
-#' first argument. See Detail section for full specification. Finally the
-#' function naively concatenate all return expression \emph{as if all gene
-#' expressions are stated in the same gene order} in data.table.
+#' nearly all real world data fail to have the same format as TCGA. In this
+#' case, one needs to tell the function how to parse the data by implementing a
+#' custom reader function that accepts the filepath as the first argument. See
+#' Detail section for full specification. The function naively concatenate all
+#' return expression \emph{as if all gene expressions are stated in the same
+#' gene order} as columns in a new data.table.
 #'
 #' @section Custom reader function: Custom reader function is given by
 #'   \code{read_fun = your_reader_fun}. It takes the filepath as the first
 #'   argument and return a data.table with the first two columns being
-#'   \code{GENE} and \code{expression} of type character and double.
+#'   \code{GENE} and \code{Expression} of type character and double.
 #'
 #'   The output joint gene expression table has first column \code{GENE} store
 #'   the gene name, which are are determined by the first sample being
 #'   evaluated.
 #'
-#'   Rest of the arguments \code{create_gene_exp(...)} will be passed to this
-#'   reader function.
+#'   Rest arguments of \code{create_gene_exp(...)} will be passed to this reader
+#'   function.
 #'
 #'   Note: all string-like columns should \strong{NOT} be of type \code{factor}.
 #'   Remember to set \code{stringsAsFactors = FALSE}.
@@ -34,7 +35,7 @@
 #' @param ... Arguments passed to the custom reader function specified in
 #'   \code{read_fun}.
 #'
-#' @return data.table of all samples gene expression, whose row are gene
+#' @return data.table of all samples gene expression, whose rows are gene
 #'   expression and columns are sample names. First column \code{GENE} contains
 #'   the corresponding gene names.
 #'
@@ -48,27 +49,29 @@
 #' sample_root <- system.file("extdata", package = "iGC")
 #' sample_desc_pth <- file.path(sample_root, "sample_desc.csv")
 #' sample_desc <- create_sample_desc(
-#'   sample_desc_pth, sample_root=sample_root
+#'     sample_desc_pth, sample_root=sample_root
 #' )[1:3]
 #'
 #' ## Define custom reader function for TCGA level 3 data
 #' my_gene_exp_reader <- function(ge_filepath) {
-#'   gene_exp <- read.table(
-#'     ge_filepath,
-#'     header = FALSE, skip = 2,
-#'     na.strings = "null",
-#'     colClasses = c("character", "double")
-#'   )
-#'   dt <- data.table::as.data.table(gene_exp)
-#'   data.table::setnames(dt, c("GENE", "Expression"))
+#'     gene_exp <- read.table(
+#'         ge_filepath,
+#'         header = FALSE, skip = 2,
+#'         na.strings = "null",
+#'         colClasses = c("character", "double")
+#'     )
+#'     dt <- data.table::as.data.table(gene_exp)
+#'     data.table::setnames(dt, c("GENE", "Expression"))
 #' }
 #' gene_exp <- create_gene_exp(
-#'   sample_desc,
-#'   read_fun = my_gene_exp_reader,
-#'   progress_width = 60
+#'     sample_desc,
+#'     read_fun = my_gene_exp_reader,
+#'     progress_width = 60
 #' )
 #' gene_exp[1:5]
 #'
+#' @note The function assumes row order for all samples' gene expression are the
+#'   same.
 #' @import data.table
 #' @import plyr
 #' @export
