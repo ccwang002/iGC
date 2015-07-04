@@ -4,9 +4,9 @@ Title: An integrated analysis package of Gene expression and Copy number alterat
 Version: 0.99.0
 Date: 2015-04-23
 Authors@R: c(
-    person("YiPin", "Lai", email = "r99945018@ntu.edu.tw", role = c("aut")),
-    person("Liang Bo", "Wang", email = "r02945054@ntu.edu.tw", role = c("aut", "cre")),
-    person("TzuPin", "Lu", email = "tplu@ntu.edu.tw", role = c("aut")),
+    person("Yi-Pin", "Lai", email = "r99945018@ntu.edu.tw", role = c("aut")),
+    person("Liang-Bo", "Wang", email = "r02945054@ntu.edu.tw", role = c("aut", "cre")),
+    person("Tzu-Pin", "Lu", email = "tplu@ntu.edu.tw", role = c("aut")),
     person("Eric Y.", "Chuang", email = "chuangey@ntu.edu.tw", role = c("aut")))
 Description: This package is intended to identify differentially expressed genes driven by
     Copy Number Alterations from samples with both gene expression and CNA data.
