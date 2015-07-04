@@ -1,0 +1,23 @@
+citHeader("To cite iGC in publications use:")
+citEntry(
+    entry        = "Unpublished",  # Later change it to `Article`
+    title        = "iGC--an integrated analysis package of Gene expression and Copy number alteration",
+    author       = personList(
+        person("Yi-Pin", "Lai"),
+        person("Liang-Bo", "Wang"),
+        person("Tzu-Pin", "Lu"),
+        person("Liang-Chuan", "Lai"),
+        person("Mong-Hsun", "Tsai"),
+        person("Eric Y.", "Chuang")
+    ),
+    note = "Manuscript submitted for publication",
+    # journal      = "Bioinformatics",
+    year         = "2015",
+    # volume       = "vv",
+    # number       = "nn",
+    # pages        = "pp--pp",
+    textVersion  = paste(
+        "Yi-Pin Lai, Liang-Bo Wang, Liang-Chuan Lai, Mong-Hsun Tsai, Tzu-Pin Lu, and Eric Y. Chuang (2015).",
+        "iGC--an integrated analysis package of Gene expression and Copy number alteration.",
+        "Manuscript submitted for publication.")
+)
