@@ -50,7 +50,7 @@
 #' }
 #' gene_cna <- direct_gene_cna(
 #'     sample_desc,
-#'     read_fun = read_cna_geo, progress=FALSE
+#'     read_fun = read_cna_geo, progress = FALSE
 #' )
 #' gene_cna
 #'

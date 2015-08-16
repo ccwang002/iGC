@@ -1,8 +1,8 @@
 #' Load and map CNA gain/loss onto human gene location by genome reference
 #'
-#' The function reads in all sample CNA data given by the sample description
-#' \code{sample_desc} and return a joint CNA gain/loss table based on gene
-#' regions across samples.
+#' The function reads through in all sample CNA data given by the sample
+#' description \code{sample_desc} and returns a joint CNA gain/loss table based
+#' on gene regions across samples.
 #'
 #' A gene is considered to have CNA gain if the overlapped CNA record expression
 #' is higher than the given threshold. Similarly, a gene is considered CNA loss
@@ -11,7 +11,7 @@
 #' majority wins. If none of the records map to the gene, NA is given.
 #'
 #' By default it assumes the data to be of TCGA level 3 file format. For other
-#' data format (e.g. raw data or other experiments from GEO), one should
+#' data formats (e.g. raw data or other experiments from GEO), one should
 #' implement a custom reader function that accepts the filepath as the first
 #' argument. See section \emph{Custom reader function} for full specification.
 #'
@@ -22,7 +22,7 @@
 #'
 #' @section Custom reader function: Custom reader function is given by
 #'   \code{read_fun = your_reader_fun}. It takes the filepath to CNA data as the
-#'   first argument and return a data.table with at least the following four
+#'   first argument and returns a data.table with at least the following four
 #'   columns: \code{Chromosome}, \code{Start}, \code{End}, and
 #'   \code{Segment_Mean} of type character, integer, integer and numeric
 #'   respectively.
@@ -37,7 +37,7 @@
 #'   \link{create_sample_desc}.
 #' @param gain_threshold CNA expression above this will be considered as gain
 #'   region. By default \eqn{\log_2{2.5} - 1}
-#' @param loss_threshold CNA expression above this will be considered as loss
+#' @param loss_threshold CNA expression below this will be considered as loss
 #'   region. By default \eqn{\log_2{1.5} - 1}
 #' @param read_fun Custom reader function, see its own section for more detail.
 #' @param progress Whether to display a progress bar. By default \code{TRUE}.
@@ -49,8 +49,8 @@
 #'   \code{read_fun}.
 #'
 #' @return data.table of CNA gain/loss on each gene region for all samples,
-#'   whose rows represent regions of genes and columns are sample names. First
-#'   column \code{GENE} contains the corresponding gene names.
+#'   whose rows represent regions of genes and columns represent sample names.
+#'   First column \code{GENE} contains the corresponding gene names.
 #'
 #' @seealso \code{\link[utils]{read.table}} and \code{\link[data.table]{fread}}
 #'   for custom reader function implementation; \code{\link{create_sample_desc}}

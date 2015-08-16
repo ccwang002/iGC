@@ -1,22 +1,23 @@
 #' Perform an integrated analysis of gene expression (GE) and copy number
 #' alteration (CNA)
 #'
-#' The function finds CNA-driven differentially expressed gene and returns the corresponding p-value,
-#' false discovery rate, and associated statistics. The result includes
-#' three tables which collects information for gain-, loss-, and both-driven
-#' genes.
+#' The function finds CNA-driven differentially expressed gene and returns the
+#' corresponding p-value, false discovery rate, and associated statistics. The
+#' result includes three tables which collects information for gain-, loss-, and
+#' both-driven genes.
 #'
 #' The gene is considered CNA-gain if the proportion of the sample exhibiting
 #' gain exceeds the threshold \code{gain_prop}, that is, number of samples
 #' having \code{gain_loss} = 1. Reversely, the gene is considered CNA-loss if
-#' \%samples that \code{gain_loss} = -1 is beyond a given threshold
+#' \%samples that \code{gain_loss} = -1 is below a given threshold
 #' \code{loss_prop}.
 #'
 #' When performing the t-test, sample grouping depends on the analysis scenario
 #' being either CNA-gain or CNA-loss driven. In CNA-gain driven scenario, two
-#' groups, CNA-gain and the other samples, are made. In CNA-loss driven scenario,
-#' group CNA-loss and the others are made. Genes appear in both scenario will be
-#' collected into a third table and excluded from their original tables.
+#' groups, CNA-gain and the other samples, are made. In CNA-loss driven
+#' scenario, group CNA-loss and the others are made. Genes that appear in both
+#' scenarios will be collected into a third table and excluded from their
+#' original tables.
 #'
 #' See the vignette for usage of this function by a thorough example.
 #'
@@ -33,14 +34,15 @@
 #' @param parallel Enable parallelism by plyr. One has to specify a parallel
 #'   engine beforehand. See example for more information.
 #'
-#' @return List of three data.table objest for CNA-driven scenarios: gain, loss,
-#'   and both, which can be accessed by names: `gain_driven`, `loss_driven` and
-#'   `both`.
+#' @return List of three data.table objects for CNA-driven scenarios: gain,
+#'   loss, and both, which can be accessed by names: `gain_driven`,
+#'   `loss_driven` and `both`.
 #'
 #' @examples
 #' require(data.table)
 #'
-#' ## Create gene_exp and gene_cna manually.
+#' ## Create gene_exp and gene_cna manually. The following shows an example
+#' ## consisting of 3 genes (BRCA2, TP53, and GNPAT) and 5 samples (A to E).
 #'
 #' gene_exp <- data.table(
 #'     GENE = c("BRCA2", "TP53", "GNPAT"),

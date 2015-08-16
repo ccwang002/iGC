@@ -1,17 +1,17 @@
 #' Create sample description table containing all required inputs
 #'
 #' Each sample will have a unique name along with a pair of CNA and gene
-#' expression file. This function generates a table of sample description
-#' by either reading an external CSV file or specifying them through separate
+#' expression file. This function generates a table of sample descriptions by
+#' either reading an external CSV file or specifying them through separate
 #' arugments in same order.
 #'
 #' @param sample_desc_filepath external sample description CSV file having at
 #'   least these three columns: \code{Sample}, \code{CNA_filepath}, and
 #'   \code{GE_filepath}. Note that the column names must be given \emph{as is}.
 #'
-#' @param sample_names character vector of distinct sample names. Samples will be
-#'   referenced by the given name through out the analysis process. They should be
-#'   valid R data.table's column names.
+#' @param sample_names character vector of distinct sample names. Samples will
+#'   be referenced by the given name through out the analysis process. They
+#'   should be valid R data.table column names.
 #'
 #' @param cna_filepaths character vector of filepaths to CNA data.
 #' @param ge_filepaths character vector of filepaths to gene expression data.
@@ -60,7 +60,7 @@
 #'   passing the root folder path to \code{sample_root}.
 #'
 #'   If for some special reasons, for example gene expression of all samples
-#'   have been collected or the CNA records for each gene exist,one don't have
+#'   have been collected or the CNA records for each gene exist, but do not have
 #'   the file paths to either CNA or gene expression data, pass it with empty
 #'   character vector of correct length, such as \code{rep('', num_samples)}.
 #'

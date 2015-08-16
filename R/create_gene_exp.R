@@ -8,7 +8,7 @@
 #' nearly all real world data fail to have the same format as TCGA. In this
 #' case, one needs to tell the function how to parse the data by implementing a
 #' custom reader function that accepts the filepath as the first argument. See
-#' Detail section for full specification. The function naively concatenate all
+#' Detail section for full specification. The function naively concatenates all
 #' return expression \emph{as if all gene expressions are stated in the same
 #' gene order} as columns in a new data.table.
 #'
@@ -70,7 +70,7 @@
 #' )
 #' gene_exp[1:5]
 #'
-#' @note The function assumes row order for all samples' gene expression are the
+#' @note The function assumes row order for all samples' gene expressions are the
 #'   same.
 #' @import data.table
 #' @import plyr
