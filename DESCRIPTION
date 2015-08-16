@@ -1,7 +1,7 @@
 Package: iGC
 Type: Package
 Title: An integrated analysis package of Gene expression and Copy number alteration
-Version: 0.99.1
+Version: 0.99.2
 Authors@R: c(
     person("Yi-Pin", "Lai", email = "r99945018@ntu.edu.tw", role = c("aut")),
     person("Liang-Bo", "Wang", email = "r02945054@ntu.edu.tw", role = c("aut", "cre")),
