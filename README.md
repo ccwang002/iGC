@@ -10,16 +10,16 @@ source("http://www.bioconductor.org/biocLite.R")
 biocLite('iGC')
 ```
 
-Otherwise, including to install the dev version, one can install iGC by [devtools].
+Otherwise, including the development version, one can install iGC by [devtools].
 
 ```{r}
 install.packages("devtools")
 devtools::install_github("ccwang002/iGC", build_vignettes = TRUE)
 ```
 
-> Note: that some requisites are needed on each platform. 
+> Note: Some requisites are needed on some platforms. 
 > 
-> [Rtools] is required on Windows; Xcode is required on OSX; A compiler and various development libraries are needed on Linux (details vary across different distros).
+> For example, [Rtools] is required on Windows; Xcode is required on OSX; A compiler and various development libraries are needed on Linux (details vary across different distros).
 
 
 ### Documentation
@@ -31,7 +31,7 @@ help(iGC)
 ```
 
 ### Citation
-If you use iGC package, please consider citing our publication,
+If you use iGC package, please consider citing our publication.
 
 > Yi-Pin Lai, Liang-Bo Wang, Liang-Chuan Lai, Mong-Hsun Tsai, Tzu-Pin Lu, and Eric Y. Chuang. iGC–an integrated analysis package of Gene expression and Copy number alteration, *(pending publication)*, (2015).
 
