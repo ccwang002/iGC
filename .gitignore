@@ -2,3 +2,4 @@ inst/doc
 .Rproj.user
 # ignore auto-generated Rd files
 man/*.Rd
+!*.Rproj
