@@ -3,22 +3,22 @@ iGC is an integrated analysis package of gene expression and copy number alterat
 
 
 ### Installation
-One can directly install iGC from Bioconductor 3.2+,
+One can directly install iGC from Bioconductor 3.2+ (released in Oct 2015),
 
 ```{r}
 source("http://www.bioconductor.org/biocLite.R")
 biocLite('iGC')
 ```
 
-Otherwise, including the development version, one can install iGC by [devtools].
+Otherwise, including installing the development version of iGC, one can install by [devtools].
 
 ```{r}
 install.packages("devtools")
 devtools::install_github("ccwang002/iGC", build_vignettes = TRUE)
 ```
 
-> Note: Some requisites are needed on some platforms. 
-> 
+> Note: Some requisites are needed on some platforms.
+>
 > For example, [Rtools] is required on Windows; Xcode is required on OSX; A compiler and various development libraries are needed on Linux (details vary across different distros).
 
 
